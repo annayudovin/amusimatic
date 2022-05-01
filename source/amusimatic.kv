@@ -1,0 +1,172 @@
+#:kivy 2.0.0
+
+#:include force source/custom.kv
+#:include force source/notegrid.kv
+#:include force source/toolbar.kv
+#:include force source/dialogs.kv
+#:include force source/controlpanel.kv
+#-------------------------------------	
+
+
+#ContainerLayout.left_panel
+<LeftTabbedPanel@TabbedPanel>:
+	do_default_tab: False
+	tab_height: 32
+	tab_width: None
+	
+	chnl_ctrl: chnl_ctrl
+	voltempo_ctrl: voltempo_ctrl
+	hlight_ctrl: hlight_ctrl
+	top_level_ref: None
+	
+	AutoSizedTabItem:
+		text: 'CHANNELS' 
+		shorten: True
+		font_size: 11
+
+		ChannelCtrlTab:
+			id: chnl_ctrl
+			ctrl_tabpanel_ref: root	
+
+	AutoSizedTabItem:
+		text: 'VOLUME &\nTEMPO'
+		shorten: True		
+		font_size: 11
+		halign: 'center'
+		valign: 'middle'
+		
+		VolumeTempoTab:
+			id: voltempo_ctrl
+			ctrl_tabpanel_ref: root		
+			
+	AutoSizedTabItem
+		text: 'HIGHLIGHT'
+		shorten: True
+		font_size: 11
+		halign: 'center'
+		valign: 'middle'
+
+		HighlightCtrlTab:
+			id: hlight_ctrl
+			ctrl_tabpanel_ref: root	
+			
+			
+#-----------------------------------------------------------------------------------	
+
+	
+<Corner@Widget>:
+
+	top_level_ref: None
+	cur_tab_num: 0
+
+	spacing: 4
+	l_pad: 5
+	b_pad: 10
+	
+	canvas:
+		Color:
+			rgba: [.1, .1, .1, 1]	# self.bcolor
+		Rectangle:
+			pos: self.pos
+			size: self.size
+	Button:
+		id: btn1
+		background_normal: ''
+		background_color: [.35, .35, .35, 1] if root.cur_tab_num == 1 else [.2, .2, .2, 1]
+		size: 15, 15
+		pos: root.pos[0] + root.l_pad, root.pos[1] + root.b_pad
+		on_release: root.top_level_ref.left_panel.activate_tab_num(1)
+		
+	Button:
+		id: btn2
+		background_normal: ''
+		background_color: [.35, .35, .35, 1] if root.cur_tab_num == 2 else [.2, .2, .2, 1]
+		size: 15, 15
+		pos: root.pos[0] + root.l_pad + 15 + root.spacing, root.pos[1] + root.b_pad
+		on_release: root.top_level_ref.left_panel.activate_tab_num(2)
+		
+		
+	Button:
+		id: btn3
+		background_normal: ''
+		background_color: [.35, .35, .35, 1] if root.cur_tab_num == 3 else [.2, .2, .2, 1]
+		size: 15, 15
+		pos: root.pos[0] + root.l_pad + 2*15 + 2*root.spacing, root.pos[1] + root.b_pad
+		on_release: root.top_level_ref.left_panel.activate_tab_num(3)
+		
+	Button:
+		id: btn4
+		background_normal: ''
+		background_color: [.35, .35, .35, 1] if root.cur_tab_num == 4 else [.2, .2, .2, 1]
+		size: 15, 15
+		pos: root.pos[0] + root.l_pad + 3*15 + 3*root.spacing, root.pos[1] + root.b_pad
+		#on_release: print('btn4', self.size, self.pos)
+
+	Button:
+		id: btn5
+		background_normal: ''
+		background_color: [.35, .35, .35, 1] if root.cur_tab_num == 5 else [.2, .2, .2, 1]
+		size: 15, 15	
+		pos: root.pos[0] + root.l_pad + 4*15 + 4*root.spacing, root.pos[1] + root.b_pad
+		#on_release: print('btn5', self.size, self.pos)	
+
+	Button:
+		id: btn6
+		background_normal: ''
+		background_color: [.35, .35, .35, 1] if root.cur_tab_num == 6 else [.2, .2, .2, 1]
+		size: 15, 15	
+		pos: root.pos[0] + root.l_pad + 5*15 + 5*root.spacing, root.pos[1] + root.b_pad
+		#on_release: print('btn5', self.size, self.pos)		
+
+		
+<ContainerLayout@GridLayout>:
+	cols: 2
+	spacing: 2
+	
+	toolbar_widget: toolbar_widget
+	note_scroller: note_scroller
+	time_scroller: time_scroller
+	left_panel: left_panel
+	bottom_corner: bottom_corner
+	
+	h_pad: 30
+	v_pad: 15
+
+	BoxLayout:
+		orientation: 'vertical'
+		size_hint: .15, 1
+		spacing: 2
+		
+		LeftTabbedPanel:
+			id: left_panel
+			size_hint: 1, .95
+			top_level_ref: root
+		
+		Corner:
+			id: bottom_corner
+			size_hint: 1, .05
+			top_level_ref: root
+			cur_tab_num: len(left_panel.tab_list) - left_panel.tab_list.index(left_panel.current_tab)
+			
+	BoxLayout:
+		orientation: 'vertical'
+		size_hint: .85, 1
+		
+		Toolbar:
+			id: toolbar_widget
+			size_hint: 1, .06
+			top_level_ref: root		
+
+		NoteScroll:	
+			id: note_scroller
+			cont_sz_mult_x: toolbar_widget.cont_sz_mult_x
+			cont_sz_mult_y: toolbar_widget.cont_sz_mult_y
+			h_pad: root.h_pad
+			v_pad: root.v_pad
+			top_level_ref: root
+		
+		TimelineScroll: # Timeline:
+			id: time_scroller
+			size_hint: 1, .05
+			h_pad: root.h_pad
+			top_level_ref: root

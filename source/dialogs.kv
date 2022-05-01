@@ -1,0 +1,142 @@
+#:kivy 2.0.0
+#:import abspath os.path.abspath
+
+#keep/use for iOS?
+# <LoadDialog@Popup>:
+	# title: 'Load File'
+	# auto_dismiss: True
+	# size_hint: .8, .5
+	# initialpath: abspath(app.directory) # r'C:\Users\Anna\Documents'
+
+	# BoxLayout:
+		# orientation: 'vertical'
+		# size_hint: 1, 1
+
+		# FileChooserListView:
+			# size_hint: 1, .97
+			# id: filechooser
+			# path: root.initialpath
+			# filters: ['*.mid']
+			# on_selection: print(self.selection[0] if self.selection else '')
+			
+		# Widget:
+			# size_hint: 1, .03
+			
+		# BoxLayout:
+			# orientation: 'horizontal'
+			# size_hint: 1, .1
+			
+			# Widget:
+				# size_hint: .1, 1
+			
+			# Button
+				# size_hint: .3, 1
+				# text: 'Load'
+				# on_release: root.load((filechooser.selection[0] if filechooser.selection else ''))
+				
+			# Widget:
+				# size_hint: .2, 1
+				
+			# Button
+				# size_hint: .3, 1
+				# text: 'Cancel'
+				# on_release: root.dismiss()
+				
+			# Widget:
+				# size_hint: .1, 1
+
+#keep/use for iOS?
+# <SaveDialog@Popup>:
+	# title: 'Save File'
+	# auto_dismiss: True
+	# size_hint: .8, .5
+	# text_input: text_input
+	# initialpath: abspath(app.directory)
+	
+	# BoxLayout:
+		# orientation: 'vertical'
+		# size_hint: 1, 1
+
+		# FileChooserListView:
+			# size_hint: 1, .80
+			# id: filechooser
+			# path: root.initialpath
+			# on_selection: text_input.text = self.selection[0] if self.selection else ''
+			
+		# TextInput:
+			# id: text_input
+			# size_hint_y: None
+			# height: self.minimum_height
+			# multiline: False	
+			
+		# BoxLayout:
+			# orientation: 'horizontal'
+			# size_hint: 1, .1
+			
+			# Widget:
+				# size_hint: .1, 1
+			
+			# Button
+				# size_hint: .3, 1
+				# text: 'Save'
+				# #on_release: root.save((text_input.text if text_input.text != '' else 'new.mid'))
+				
+			# Widget:
+				# size_hint: .2, 1
+				
+			# Button
+				# size_hint: .3, 1
+				# text: 'Cancel'
+				# on_release: root.dismiss()
+				
+			# Widget:
+				# size_hint: .1, 1
+
+
+<SettingsDialog@Popup>:
+	title: 'Label Settings'
+	auto_dismiss: True
+	size_hint: .8, .5
+
+	BoxLayout:
+		orientation: 'vertical'
+		size_hint: 1, 1
+
+		Widget:
+			size_hint: 1, .97
+			id: placeholder
+			
+		Widget:
+			size_hint: 1, .03
+			
+		BoxLayout:
+			orientation: 'horizontal'
+			size_hint: 1, .1
+			
+			Widget:
+				size_hint: .1, 1
+			
+			Button
+				size_hint: .2, 1
+				text: 'OK'
+				# on_release: root.save_settings(root)
+				
+			Widget:
+				size_hint: .1, 1
+				
+			Button
+				size_hint: .2, 1
+				text: 'Cancel'
+				on_release: root.dismiss()
+				# on_release: root.undo_changes(root)
+				
+			Widget:
+				size_hint: .1, 1
+				
+			Button
+				size_hint: .2, 1
+				text: 'Restore Defaults'
+				# on_release: root.restore_defaults(root)
+
+			Widget:
+				size_hint: .1, 1

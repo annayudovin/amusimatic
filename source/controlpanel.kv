@@ -1,0 +1,1554 @@
+#:kivy 2.0.0
+#:import Factory kivy.factory.Factory
+	
+
+#-----------------------------------------------------------------------------------		
+#--------------Volume/Tempo Controls Tab -------------------------------------------
+				
+#parent = VolumeTempoTab			
+<TimeSig@Widget>
+	bcolor: [.2, .2, .2, 1]
+	numerator: numerator
+	denominator: denominator
+	ctrl_tabpanel_ref: None
+	
+	canvas:
+		Color:
+			rgba: self.bcolor	
+		Rectangle:
+			pos: self.pos
+			size: self.size
+					
+	Label:
+		id: title
+		text: 'TIME SIGNATURE:'
+		font_size: 10
+		size: max(root.size[0], 98), 17
+		pos: (root.pos[0], root.pos[1] + 56)
+
+	AdjusterBox:
+		id: numerator
+		val: 4
+		min: 2
+		max: 12
+		step: 1
+		power_of_2: False
+		digits: 2
+		size: max(root.size[0], 98), 17
+		pos: (root.pos[0], root.pos[1] + 32)
+		on_val: root.check_numerator()
+
+	Widget:
+		id: line
+		canvas:
+			Color:
+				rgba: [1, 1, 1, 1]
+			Line:
+				points: [int(self.width *.33), int(self.pos[1])+.284, int(self.width *.75), int(self.pos[1])+.284]
+				width: 1
+		size: max(root.size[0], 98), 2
+		pos: (root.pos[0], root.pos[1] + 30)
+		
+	AdjusterBox:
+		id: denominator
+		val: 4
+		min: 0
+		max: 4
+		step: 2
+		power_of_2: True
+		digits: 2
+		size: max(root.size[0], 98), 17
+		pos: (root.pos[0], root.pos[1] + 6)
+		on_val: root.check_denominator()
+	
+	
+#parent = VolumeTempoTab	
+<ShortestNote@Widget>
+	bcolor: [.2, .2, .2, 1]
+	denominator: denominator
+	ctrl_tabpanel_ref: None
+	
+	canvas:
+		Color:
+			rgba: self.bcolor	
+		Rectangle:
+			pos: self.pos
+			size: self.size
+					
+	Label:
+		text: 'SHORTEST NOTE:'
+		font_size: 10
+		size: max(root.size[0], 98), 17
+		pos: (root.pos[0], root.pos[1] + 56)
+		
+	Label:
+		text: '1'
+		size: max(root.size[0], 98), 16
+		pos: (root.pos[0], root.pos[1] + 34)
+		
+	Widget:
+		id: line
+		canvas:
+			Color:
+				rgba: [1, 1, 1, 1]
+			Line:
+				points: [int(self.width *.33), int(self.pos[1])+.284, int(self.width *.75), int(self.pos[1])+.284] 
+				width: 1
+		size: max(root.size[0], 98), 2
+		pos: (root.pos[0], root.pos[1] + 30)
+
+	AdjusterBox:
+		id: denominator
+		val: 4
+		min: 1
+		max: 5
+		step: 2
+		power_of_2: True
+		digits: 2
+		size: max(root.size[0], 98), 17
+		pos: (root.pos[0], root.pos[1] + 6)
+		
+
+#parent = VolumeTempoTab	
+<TicksPerBar@Widget>
+	bcolor: [.2, .2, .2, 1]
+	tpb_lbl: tpb_lbl
+	val: 1920
+	ctrl_tabpanel_ref: None
+	
+	canvas:
+		Color:
+			rgba: self.bcolor	
+		Rectangle:
+			pos: self.pos
+			size: self.size
+					
+	Label:
+		text: 'TICKS PER BAR:'
+		font_size: 10
+		size: max(root.size[0], 98), 17
+		pos: (root.pos[0], root.pos[1] + 20)
+		
+	Label:
+		id: tpb_lbl
+		text: str(root.val)
+		size: max(root.size[0], 98), 16
+		pos: (root.pos[0], root.pos[1] + 4)
+		
+		
+#parent = LeftTabbedPanel.TabbedPanelItem
+<VolumeTempoTab@Widget>
+	bcolor: [.1, .1, .1, 1]
+	
+	ctrl_tabpanel_ref: None
+	global_vol: global_vol
+	
+	volume_approve: volume_approve
+	separator: separator
+	tempo_ctrl: tempo_ctrl 
+	tickdiv_ctrl: tickdiv_ctrl
+	time_sig_ctrl: time_sig_ctrl
+	ticks_per_bar: ticks_per_bar
+	shortest_note: shortest_note
+	time_approve: time_approve
+	
+	canvas:
+		Color:
+			rgba: self.bcolor	
+		Rectangle:
+			pos: self.pos
+			size: self.size
+		
+	VolumeAdjuster:	
+		id: global_vol
+		group_name: 'global_vol_adj'
+		absolute_selected: False
+		ctrl_tabpanel_ref: root.ctrl_tabpanel_ref
+		text: 'GLOBAL VOLUME:'
+		size: max(root.size[0] - 8, 98), 83
+		pos: (root.pos[0] + 4, root.pos[1] - 83 + 528)
+	
+	Button:
+		id: volume_approve
+		font_size: 12
+		text: 'OK'
+		size: max(root.size[0] - 8, 98), 18
+		pos: (root.pos[0] + 4, root.pos[1] - 103 + 528)	
+		text_size: self.size
+		halign: 'center'
+		valign: 'middle'
+		on_release: root.adjust_volume()
+		
+	Widget:
+		id: separator
+		canvas:
+			Color:
+				rgba: [.25, .25, .25, 1]
+			Line:
+				points: [self.pos[0], self.center_y, self.width, self.center_y] 
+				width: 1
+		size: max(root.size[0] - 8, 98), 6
+		pos: (root.pos[0] + 4, root.pos[1] - 194 + 528)	
+		
+	SliderAdjuster:
+		id: tempo_ctrl
+		ctrl_tabpanel_ref: root.ctrl_tabpanel_ref
+		text: 'TEMPO: (BPM)'
+		min: 1
+		max: 250
+		box_step: 1
+		slide_step: 5
+		val: 120
+		digits: 3
+		size: max(root.size[0] - 8, 98), 58
+		pos: (root.pos[0] + 4, root.pos[1] - 254 + 528)	
+		
+	SliderAdjuster:
+		id: tickdiv_ctrl
+		ctrl_tabpanel_ref: root.ctrl_tabpanel_ref
+		text: 'TICKS PER BEAT:'
+		min: 1
+		max: 2500
+		box_step: 1
+		slide_step: 5
+		val: 480
+		digits: 4
+		size: max(root.size[0] - 8, 98), 58
+		pos: (root.pos[0] + 4, root.pos[1] - 314 + 528)	
+		on_val: root.recalc_scale()
+	
+	TicksPerBar:
+		id: ticks_per_bar
+		ctrl_tabpanel_ref: root.ctrl_tabpanel_ref
+		val: 1920		
+		size: max(root.size[0] - 8, 98), 38
+		pos: (root.pos[0] + 4, root.pos[1] - 354 + 528)
+		
+	TimeSig:
+		id: time_sig_ctrl
+		ctrl_tabpanel_ref: root.ctrl_tabpanel_ref
+		size: max(root.size[0] - 8, 98), 74
+		pos: (root.pos[0] + 4, root.pos[1] - 430 + 528)	
+			
+	ShortestNote:
+		id: shortest_note
+		ctrl_tabpanel_ref: root.ctrl_tabpanel_ref
+		size: max(root.size[0] - 8, 98), 74
+		pos: (root.pos[0] + 4, root.pos[1] - 506 + 528)
+
+	Button:
+		id: time_approve
+		font_size: 12
+		text: 'OK'
+		size: max(root.size[0] - 8, 98), 18
+		pos: (root.pos[0] + 4, root.pos[1] - 526 + 528)	
+		text_size: self.size
+		halign: 'center'
+		valign: 'middle'
+		on_release: root.adjust_timing()
+		
+	
+
+#-----------------------------------------------------------------------------------
+#--------------Channel Controls Tab ------------------------------------------------			
+<ChannelColor@Widget>
+	text: 'color'
+	font_sz: 10
+	chn_color: [1, 1, 1, 1]
+	owner: None
+	
+	color_btn: color_box
+	lbl: lbl
+		
+	Button:
+		id: color_box
+		background_normal: ''
+		background_color: root.chn_color
+		text: ''
+		size: 16, 16
+		pos: (root.pos[0] + 2, root.pos[1] + (root.size[1]-16.0)/2)
+		on_release: root.edit()
+		
+	Label:
+		id: lbl
+		markup: True
+		text: root.text
+		font_size: root.font_sz		
+		text_size: self.size
+		halign: 'left'
+		valign: 'middle'
+		size: (root.size[0] - 22.2, root.size[1])    
+		pos: (root.pos[0] + 22.2, root.pos[1])
+		
+
+		
+<ChannelCheck@Widget>:
+	text: ''
+	font_sz: 10
+	active: False	
+	
+	chk_box: chk_box
+	lbl: lbl
+
+	CheckBox:
+		id: chk_box
+		on_active: root.active = self.active
+		size: 19.4, 19.4
+		pos: root.pos
+
+
+	Label:
+		id: lbl
+		text: root.text
+		font_size: root.font_sz		
+		text_size: self.size
+		halign: 'left'
+		valign: 'middle'
+		size: (root.size[0] - 22.4, root.size[1])    
+		pos: (root.pos[0] + 22.4, root.pos[1])
+		
+		
+		
+<ChannelDropDown@DropDown>:
+	font_sz: 10
+	chn_color: [1, 1, 1, 1]
+	bcolor: [.15, .15, .15, 1]
+	spn_color: [.5, .5, .5, 1]
+	chk_hide: chk_hide
+	chk_mute: chk_mute
+	midi_voice_idx: 0
+	instrument_spnr: instrument_spnr
+
+	canvas:
+		Color:
+			rgba: self.bcolor	
+		Rectangle:
+			pos: self.pos
+			size: self.size
+			
+		Color:
+			rgba: [.3, .3, .3, .7]
+		Line:
+			width: 1
+			rectangle: self.x, self.y, self.width-1, self.height-1
+	
+	ChannelCheck:
+		id: chk_hide
+		text: 'hide'
+		font_sz: root.font_sz
+		height: 20
+		width: root.width
+		size_hint_y: None
+		on_active: root.hidden = self.active 
+		
+	ChannelCheck:
+		id: chk_mute
+		text: 'mute'
+		font_sz: root.font_sz				
+		height: 20
+		width: root.width
+		size_hint_y: None
+		on_active: root.muted = self.active 
+		
+	ChannelColor:
+		id: pick_color
+		font_size: root.font_sz
+		chn_color: root.chn_color
+		text: 'color'
+		owner: root.caller
+		height: 20
+		width: root.width
+		size_hint_y: None	
+
+	USpinner:
+		id: instrument_spnr 
+		text: root.instruments_list[root.midi_voice_idx]
+		background_color: root.spn_color
+		values: root.instruments_list
+		padding: 4, 5
+		font_size: root.font_sz
+		text_size: self.size
+		halign: 'left'
+		valign: 'bottom'
+		height: 20
+		size_hint_y: None
+		on_user_text: root.instrument_selected(self.user_text) 
+
+
+		
+<Channel@Widget>:
+	cnum: 0
+	hidden: False
+	muted: False
+	deleted: False
+	
+	default_chn_color: [0, 0, 0, 0]
+	chn_color: self.default_chn_color 
+	btn_color: self.chn_color if not self.hidden else sum([self.chn_color[:3],[.05]], [])
+	bcolor: [.1, .1, .1, 1]
+	
+	font_sz: 10	
+	font_type: 'i' if self.muted else 'b'
+	text: 'CHANNEL ' + str(root.cnum) if self.cnum != 10 else 'PERCUSSION'
+
+	color_btn: color_box
+	lbl: lbl
+	x_button: x_button
+	
+	canvas:
+		Color:
+			rgba: self.bcolor	
+		Rectangle:
+			pos: self.pos
+			size: self.size
+			
+	Button:
+		id: color_box
+		background_normal: ''
+		background_color: root.btn_color
+		text: ''
+		size: 16, 16
+		pos: (root.pos[0] + 2, root.pos[1] + (root.size[1]-16)/2)
+		on_release: root.edit()
+		
+	Label:
+		id: lbl
+		markup: True
+		text: '[' + root.font_type + ']' + root.text + '[/' + root.font_type + ']'
+		font_size: root.font_sz		
+		text_size: self.size
+		halign: 'left'
+		valign: 'middle'
+		size: (root.size[0] - 31, root.size[1])
+		pos: (root.pos[0] + 20, root.pos[1])
+	
+	Button:
+		canvas.after:
+			Color:
+				rgba: [.2, .2, .2, .7]
+			Line:
+				width: 1
+				rectangle: self.x, self.y, self.width-1, self.height-1
+				
+		id: x_button
+		background_normal: ''
+		background_color: [.15, .15, .15, 1]
+		text: 'x'
+		font_size: 8
+		size: 15, 15
+		pos: (root.pos[0] + root.size[0] - 17, root.pos[1] + root.size[1] - 17)
+		on_release: root.remove()
+
+	
+		
+# RGBA
+# CH1 (0, 0.651, 1, 1)
+# CH2 (0, 0.235, 1, 1)
+# CH3 (0.302, 0.188, 0.753, 1)
+# CH4 (0.62, 0, 1, 1)
+# CH5 (0.706, 0.188, 0.753, 1)
+# CH6 (1, 0, 0.604, 1)
+# CH7 (1, 0, 0.251, 1)
+# CH8 (1, 0.235, 0, 1)
+# CH9 (1, 0.537, 0, 1)
+# CH10 (.4, .4, .4, 1)
+# CH11 (1, 0.988, 0, 1)
+# CH12 (0.635, 1, 0, 1)
+# CH13 (0.149, 0.753, 0, 1)
+# CH14 (0, 1, 0.216, 1)
+# CH15 (0, 0.753, 0.478, 1)
+# CH16 (0, 1, 1, 1)
+
+<ChannelList@BoxLayout>:
+	orientation: 'vertical'
+	spacing: 2
+	#[padding_left, padding_top, padding_right, padding_bottom]
+	padding: 0, 3, 0, 3
+	ctrl_tabpanel_ref: None
+	show_count: 16
+	auto_select: False
+
+	canvas:
+		Color:
+			rgba: [0, 0, 0, 1]
+		Rectangle:
+			pos: self.pos
+			size: self.size
+
+	Channel:
+		id: channel1
+		default_chn_color: [0, 0.651, 1, 1]
+		cnum: 1
+		ctrl_tabpanel_ref: root.ctrl_tabpanel_ref
+		size_hint: 1, .0625
+
+	Channel:
+		id: channel2
+		default_chn_color: [0, 0.235, 1, 1]
+		cnum: 2
+		ctrl_tabpanel_ref: root.ctrl_tabpanel_ref
+		size_hint: 1, .0625
+
+	Channel:
+		id: channel3
+		default_chn_color: [0.302, 0.188, 0.753, 1]
+		cnum: 3
+		ctrl_tabpanel_ref: root.ctrl_tabpanel_ref
+		size_hint: 1, .0625
+		
+	Channel:
+		id: channel4
+		default_chn_color: [0.62, 0, 1, 1]
+		cnum: 4
+		ctrl_tabpanel_ref: root.ctrl_tabpanel_ref
+		size_hint: 1, .0625
+
+	Channel:
+		id: channel5
+		default_chn_color: [0.706, 0.188, 0.753, 1]
+		cnum: 5
+		ctrl_tabpanel_ref: root.ctrl_tabpanel_ref
+		size_hint: 1, .0625
+		
+	Channel:
+		id: channel6
+		default_chn_color: [1, 0, 0.604, 1]
+		cnum: 6
+		ctrl_tabpanel_ref: root.ctrl_tabpanel_ref
+		size_hint: 1, .0625
+		
+	Channel:
+		id: channel7
+		default_chn_color: [1, 0, 0.251, 1]
+		cnum: 7
+		ctrl_tabpanel_ref: root.ctrl_tabpanel_ref
+		size_hint: 1, .0625		
+		
+	Channel:
+		id: channel8
+		default_chn_color: [1, 0.235, 0, 1]
+		cnum: 8
+		ctrl_tabpanel_ref: root.ctrl_tabpanel_ref
+		size_hint: 1, .0625
+
+	Channel:
+		id: channel9
+		default_chn_color: [1, 0.537, 0, 1]
+		cnum: 9
+		ctrl_tabpanel_ref: root.ctrl_tabpanel_ref
+		size_hint: 1, .0625
+		
+	Channel:
+		id: channel10
+		default_chn_color: [.4, .4, .4, 1]
+		cnum: 10
+		ctrl_tabpanel_ref: root.ctrl_tabpanel_ref
+		size_hint: 1, .0625
+		
+	Channel:
+		id: channel11
+		default_chn_color: [1, 0.988, 0, 1]
+		cnum: 11
+		ctrl_tabpanel_ref: root.ctrl_tabpanel_ref
+		size_hint: 1, .0625
+		
+	Channel:
+		id: channel12
+		default_chn_color: [0.635, 1, 0, 1]
+		cnum: 12
+		ctrl_tabpanel_ref: root.ctrl_tabpanel_ref
+		size_hint: 1, .0625
+		
+	Channel:
+		id: channel13
+		default_chn_color: [0.149, 0.753, 0, 1]
+		cnum: 13
+		ctrl_tabpanel_ref: root.ctrl_tabpanel_ref
+		size_hint: 1, .0625
+		
+	Channel:
+		id: channel14
+		default_chn_color: [0, 1, 0.216, 1]
+		cnum: 14
+		ctrl_tabpanel_ref: root.ctrl_tabpanel_ref
+		size_hint: 1, .0625
+		
+	Channel:
+		id: channel15
+		default_chn_color: [0, 0.753, 0.478, 1]
+		cnum: 15
+		ctrl_tabpanel_ref: root.ctrl_tabpanel_ref
+		size_hint: 1, .0625
+		
+	Channel:
+		id: channel16
+		default_chn_color: [0, 1, 1, 1]
+		cnum: 16
+		ctrl_tabpanel_ref: root.ctrl_tabpanel_ref
+		size_hint: 1, .0625
+
+	
+<ChannelScroll@ScrollView>:
+	scroll_type: ['bars']
+	do_scroll_x: False
+	bar_pos_y: 'right'
+	bar_width: 5
+	bar_color: [.3, .3, .3, 1]
+	bar_inactive_color: [.35, .35, .35, 1]
+	
+	channel_list: chnlst	
+	ctrl_tabpanel_ref: None
+		
+	ChannelList: 
+		id: chnlst	
+		size_hint_x: (root.width - root.bar_width)/(root.width + .001) #None
+		size_hint_y: None
+		height: str(28 * self.show_count + 2 * (self.show_count - 1) + 6) + 'sp'
+		ctrl_tabpanel_ref: root.ctrl_tabpanel_ref
+		
+
+		
+<ChannelListDropDown@DropDown>:
+	spacing: 2
+	padding: 2
+
+	Button:
+		id: btn_all		
+		text: 'SHOW ALL'
+		font_size: 10
+		width: root.width
+		size_hint_y: None
+		height: '30dp'
+		on_press: root.caller.channel_list.show_all()
+		on_release: root.dismiss()
+
+	Button:
+		id: btn_ch1
+		text: 'SHOW CHANNEL 1 ONLY'
+		font_size: 10
+		width: root.width
+		size_hint_y: None
+		height: '30dp'
+		on_press: root.caller.channel_list.just_one()
+		on_release: root.dismiss()		
+
+	Button:
+		id: btn_muted		
+		text: 'REMOVE MUTED'
+		font_size: 10
+		width: root.width
+		size_hint_y: None
+		height: '30dp'
+		on_press: root.caller.channel_list.remove_muted()
+		on_release: root.dismiss()	
+				
+	Button:
+		id: btn_unused		
+		text: 'SHOW ALL NOT MUTED'
+		font_size: 10
+		width: root.width			
+		size_hint_y: None
+		height: '30dp'
+		on_press: root.caller.channel_list.show_unmuted()
+		on_release: root.dismiss()
+		
+	Button:
+		id: btn_hidden		
+		text: 'REMOVE HIDDEN'
+		font_size: 10
+		width: root.width
+		size_hint_y: None
+		height: '30dp'
+		on_press: root.caller.channel_list.remove_hidden()
+		on_release: root.dismiss()		
+		
+	Button:
+		id: btn_unused		
+		text: 'SHOW ALL NOT HIDDEN'
+		font_size: 10
+		width: root.width			
+		size_hint_y: None
+		height: '30dp'
+		on_press: root.caller.channel_list.show_unhidden()
+		on_release: root.dismiss()
+		
+	Button:
+		id: btn_unused		
+		text: 'REMOVE UNUSED'
+		font_size: 10
+		width: root.width
+		size_hint_y: None
+		height: '30dp'
+		on_press: print('TODO: remove unused channels from list')
+		on_release: root.dismiss()
+		
+	Button:
+		id: btn_unused		
+		text: 'SHOW ALL USED'
+		font_size: 10
+		width: root.width
+		size_hint_y: None
+		height: '30dp'
+		on_press: print('TODO: add all used channels to list')
+		on_release: root.dismiss()		
+		
+	Button:
+		id: btn_clear
+		text: 'CLEAR FLAGS'
+		font_size: 10
+		width: root.width
+		size_hint_y: None
+		height: '30dp'
+		on_press: root.caller.channel_list.clear_checks()
+		on_release: root.dismiss()	
+
+	
+	
+<ChannelCtrlTab@BoxLayout>:
+	orientation: 'vertical'
+	spacing: 3
+	#[padding_left, padding_top, padding_right, padding_bottom]
+	padding: 0, 3, 0, 0
+	
+	ctrl_tabpanel_ref: None
+	auto_select: True
+	
+	chn_scroll: chn_scroll
+	ctrl_btn: ctrl_btn
+	btn_auto_select: btn_auto_select
+	lbl: lbl
+	
+
+	Button:
+		id: ctrl_btn
+		text: 'CHANNEL LIST OPTIONS'
+		font_size: 11
+		text_size: self.size
+		halign: 'center'
+		valign: 'middle'
+		dropdown: Factory.ChannelListDropDown(caller=root.chn_scroll)
+		on_release: self.dropdown.open(self)	#(root.lbl)
+		size_hint: 1, .06
+	
+
+	BoxLayout:
+		orientation: 'horizontal'
+		spacing: 2
+		#[padding_left, padding_top, padding_right, padding_bottom]
+		padding: 0, 0, 3, 0
+		size_hint: 1, .035
+
+		Label:
+			id: lbl
+			markup: True		
+			#[sub][/sub] - subscript, [sup][/sup] - superscript
+			text: 'AUTO SELECT 1' + '[size=20][sub]st[/sub][/size]' + ': '
+			font_size: 10
+			text_size: self.size
+			halign: 'right'
+			valign: 'middle'
+			size_hint: .77, 1
+
+		ToggleButton:
+			id: btn_auto_select
+			state: 'down'
+			text: 'ON' if self.state == 'down' else 'OFF'
+			font_size: 11
+			text_size: self.size
+			halign: 'center'
+			valign: 'middle'
+			size_hint: .23, 1	
+			on_state: root.auto_select = (self.state == 'down')
+			#on_state: root.switch_editable(self, self.state)	#root.chn_scroll.channel_list.switch_editable(self, self.state)
+
+	ChannelScroll:
+		id: chn_scroll
+		size_hint: 1, .62
+		ctrl_tabpanel_ref: root.ctrl_tabpanel_ref	
+	
+	
+#-----------------------------------------------------------------------------------
+#--------------Highlight Controls Tab ----------------------------------------------
+
+<ScaleNameSelector@Widget>:
+	font_sz: 11
+
+	diatonic_spnr: diatonic_spnr
+	other_scales_spnr: other_scales_spnr
+	final_name: ''
+	interval_str: ''
+
+	Label:
+		id: diatonic_lbl
+		text: 'DIATONIC SCALES:'
+		font_size: root.font_sz
+		text_size: self.size
+		halign: 'left'
+		valign: 'bottom'
+		padding: 0, 4
+		size: 100, 18
+		pos: root.pos[0], root.pos[1] + 60
+		
+	USpinner:
+		id: diatonic_spnr
+		text: '' 
+		values: root.diatonic_scales_list
+		padding: 4, 6
+		font_size: root.font_sz-1
+		text_size: self.size
+		halign: 'left'
+		valign: 'bottom'
+		size: 120, 20
+		size_hint: None, None
+		pos: root.pos[0], root.pos[1] + 40 
+		on_user_text: root.scale_selected('diatonic', self.user_text) 
+
+	Label:
+		id: other_s_lbl
+		text: 'OTHER SCALES:'
+		font_size: root.font_sz
+		text_size: self.size
+		halign: 'left'
+		valign: 'bottom'
+		padding: 0, 4
+		size: 100, 18
+		pos: root.pos[0], root.pos[1] + 20
+		
+	USpinner:
+		id: other_scales_spnr
+		text: '' 
+		values: root.other_scales_list
+		padding: 4, 6
+		font_size: root.font_sz-1
+		text_size: self.size
+		halign: 'left'
+		valign: 'bottom'
+		size: 120, 20
+		size_hint: None, None	
+		pos: root.pos[0], root.pos[1]
+		on_user_text: root.scale_selected('other', self.user_text)
+		
+
+		
+<IntervalStrSelector@Widget>:
+	font_sz: 11
+
+	ud_spnr1: ud_spnr1
+	ud_spnr2: ud_spnr2
+	ud_spnr3: ud_spnr3
+	ud_spnr4: ud_spnr4
+	ud_spnr5: ud_spnr5
+	ud_spnr6: ud_spnr6
+	ud_spnr7: ud_spnr7
+	ud_spnr8: ud_spnr8
+	ud_spnr9: ud_spnr9
+	interval_str: ''
+	init_u_text: '-'
+
+	Label:
+		id: ud_lbl
+		text: 'DEFINE INTERVALS:'
+		font_size: root.font_sz
+		text_size: self.size
+		halign: 'left'
+		valign: 'bottom'
+		padding: 0, 4
+		size: 100, 18
+		pos: root.pos[0]+2, root.pos[1] + 40
+		
+	USpinner:
+		id: ud_spnr1
+		pos_num: 0
+		text: root.intervals_list[0]
+		user_text: root.init_u_text
+		values: root.scale_steps_list
+		padding: 0, 6
+		font_size: 10
+		text_size: self.size
+		halign: 'center'
+		valign: 'bottom'
+		size: 20, 20
+		size_hint: None, None
+		pos: root.pos[0]+2, root.pos[1] + 20
+		on_user_text: root.update_interval_str(self, self.user_text)
+
+	Label:
+		text: '-'
+		font_size: 11
+		size: 4, 20
+		pos: root.pos[0]+22, root.pos[1]+22
+		
+	USpinner:
+		id: ud_spnr2
+		pos_num: 1
+		text: root.intervals_list[1]
+		user_text: root.init_u_text
+		values: root.scale_steps_list
+		padding: 0, 6
+		font_size: 10
+		text_size: self.size
+		halign: 'center'
+		valign: 'bottom'
+		size: 20, 20
+		size_hint: None, None
+		pos: root.pos[0]+24, root.pos[1] + 20
+		on_user_text: root.update_interval_str(self, self.user_text)
+
+	Label:
+		text: '-'
+		font_size: 11
+		size: 4, 20
+		pos: root.pos[0]+44, root.pos[1]+22
+		
+	USpinner:
+		id: ud_spnr3
+		pos_num: 2
+		text: root.intervals_list[2]
+		user_text: root.init_u_text
+		values: root.scale_steps_list
+		padding: 0, 6
+		font_size: 10
+		text_size: self.size
+		halign: 'center'
+		valign: 'bottom'
+		size: 20, 20
+		size_hint: None, None
+		pos: root.pos[0]+46, root.pos[1] + 20
+		on_user_text: root.update_interval_str(self, self.user_text)		
+		
+	Label:
+		text: '-'
+		font_size: 11
+		size: 4, 20
+		pos: root.pos[0]+66, root.pos[1]+22
+		
+	USpinner:
+		id: ud_spnr4
+		pos_num: 3
+		text: root.intervals_list[3]
+		user_text: root.init_u_text
+		values: root.scale_steps_list
+		padding: 0, 6
+		font_size: 10
+		text_size: self.size
+		halign: 'center'
+		valign: 'bottom'
+		size: 20, 20
+		size_hint: None, None
+		pos: root.pos[0]+68, root.pos[1] + 20
+		on_user_text: root.update_interval_str(self, self.user_text)		
+		
+	Label:
+		text: '-'
+		font_size: 11
+		size: 4, 20
+		pos: root.pos[0]+88, root.pos[1]+22
+		
+	USpinner:
+		id: ud_spnr5
+		pos_num: 4
+		text: root.intervals_list[4]
+		user_text: root.init_u_text
+		values: root.scale_steps_list
+		padding: 0, 6
+		font_size: 10
+		text_size: self.size
+		halign: 'center'
+		valign: 'bottom'
+		size: 20, 20
+		size_hint: None, None
+		pos: root.pos[0]+90, root.pos[1] + 20
+		on_user_text: root.update_interval_str(self, self.user_text)	
+	
+	Label:
+		text: '-'
+		font_size: 11
+		size: 4, 20
+		pos: root.pos[0]+110, root.pos[1]+22
+	
+#------line 2 of interval selector
+	Label:
+		text: '-'
+		font_size: 11
+		size: 4, 20
+		pos: root.pos[0]+12, root.pos[1]+2
+		
+	USpinner:
+		id: ud_spnr6
+		pos_num: 5
+		text: root.intervals_list[5]
+		user_text: root.init_u_text
+		values: root.scale_steps_list
+		padding: 0, 6
+		font_size: 10
+		text_size: self.size
+		halign: 'center'
+		valign: 'bottom'
+		size: 20, 20
+		size_hint: None, None
+		pos: root.pos[0]+14, root.pos[1] 
+		on_user_text: root.update_interval_str(self, self.user_text)
+
+	Label:
+		text: '-'
+		font_size: 11
+		size: 4, 20
+		pos: root.pos[0]+34, root.pos[1]+2
+		
+	USpinner:
+		id: ud_spnr7
+		pos_num: 6
+		text: root.intervals_list[6]
+		user_text: root.init_u_text
+		values: root.scale_steps_list
+		padding: 0, 6
+		font_size: 10
+		text_size: self.size
+		halign: 'center'
+		valign: 'bottom'
+		size: 20, 20
+		size_hint: None, None
+		pos: root.pos[0]+36, root.pos[1] 
+		on_user_text: root.update_interval_str(self, self.user_text)		
+		
+	Label:
+		text: '-'
+		font_size: 11
+		size: 4, 20
+		pos: root.pos[0]+56, root.pos[1]+2
+		
+	USpinner:
+		id: ud_spnr8
+		pos_num: 7
+		text: root.intervals_list[7]
+		user_text: root.init_u_text
+		values: root.scale_steps_list
+		padding: 0, 6
+		font_size: 10
+		text_size: self.size
+		halign: 'center'
+		valign: 'bottom'
+		size: 20, 20
+		size_hint: None, None	
+		pos: root.pos[0]+58, root.pos[1] 	
+		on_user_text: root.update_interval_str(self, self.user_text)		
+		
+	Label:
+		text: '-'
+		font_size: 11
+		size: 4, 20
+		pos: root.pos[0]+78, root.pos[1]+2
+		
+	USpinner:
+		id: ud_spnr9
+		pos_num: 8
+		text: root.intervals_list[8]
+		user_text: root.init_u_text
+		values: root.scale_steps_list
+		padding: 0, 6
+		font_size: 10
+		text_size: self.size
+		halign: 'center'
+		valign: 'bottom'
+		size: 20, 20
+		size_hint: None, None
+		pos: root.pos[0]+80, root.pos[1] 	
+		on_user_text: root.update_interval_str(self, self.user_text)					
+
+
+	
+<ScalePicker@Widget>:
+	font_sz: 11
+
+	dropdown_ref: None
+	interval_str: ''
+	scale_name: ''
+			
+	scale_namer: scale_namer
+	string_definer: string_definer
+	interval_disp: interval_disp
+
+	Label:
+		markup: True
+		text: '[b]SELECT PRE-DEFINED[/b]'
+		font_size: root.font_sz - 2
+		size: 120, 18
+		pos: root.pos[0], root.pos[1] + 206
+		
+	ScaleNameSelector:
+		id: scale_namer
+		font_sz: root.font_sz
+		interval_str: root.interval_str
+		size: 120, 78
+		pos: root.pos[0], root.pos[1] + 126
+		on_final_name: root.scale_to_intervals(self.final_name, self.interval_str)
+		
+	Label:
+		canvas:
+			Color:
+				rgba: [.5, .5, .5, .8]
+			Line:
+				width: 1
+				rectangle: self.pos[0]+4, self.pos[1]+1, 112, 18
+		id: interval_disp
+		text: root.interval_str
+		font_size: root.font_sz
+		text_size: self.size
+		halign: 'center'
+		valign: 'bottom'
+		padding: 0, 4
+		size: 120, 20
+		pos: root.pos[0], root.pos[1] + 102
+		
+	Label:
+		canvas:
+			Color:
+				rgba: [.5, .5, .5, .8]
+			Line:
+				width: 1
+				points: self.pos[0]+4, self.pos[1]+8, self.pos[0]+55, self.pos[1]+8
+			Line:
+				width: 1
+				points: self.pos[0]+65, self.pos[1]+8, self.pos[0]+112, self.pos[1]+8
+		markup: True
+		text: '[b]OR[/b]'
+		font_size: root.font_sz - 2
+		size: 120, 18
+		pos: root.pos[0], root.pos[1] + 82
+		
+	IntervalStrSelector:	
+		id: string_definer
+		font_size: root.font_sz
+		size: 120, 60
+		pos: root.pos[0]+2, root.pos[1] + 22
+		on_interval_str:  root.intervals_to_scale(self.interval_str)
+
+	Button:
+		id: ok_btn
+		text: 'OK'
+		font_size: root.font_sz-2
+		size: 110, 18
+		pos: root.pos[0]+5, root.pos[1]
+		on_release: root.accept_selections()
+		
+	
+	
+<ScalePickerDropDown@DropDown>:
+	size_hint_y: None
+	size_hint_x: None
+	auto_width: False
+	width: 125
+	bcolor: [.15, .15, .15, 1]
+
+	scale_picker: scale_picker
+
+	canvas:
+		Color:
+			rgba: self.bcolor	
+		Rectangle:
+			pos: self.pos
+			size: self.size
+			
+		Color:
+			rgba: [.3, .3, .3, .7]
+		Line:
+			width: 1
+			rectangle: self.x, self.y, self.width-1, self.height-1
+	
+	ScalePicker:
+		id: scale_picker
+		dropdown_ref: root
+		size_hint_y: None
+		size_hint_x: None
+		width: 125
+		height: 220				
+		
+
+
+<RootNoteSelector@Widget>:
+	bcolor: [0, 0, 0, 1]
+	btn_color: [1, 1, 1, 1] 
+	font_sz: 11
+	root_color: [1, 1, 1, 0]
+	root_note: ''
+
+	bottom_pad: 0
+	root_note_spnr: root_note_spnr
+	separate_color_chk: separate_color_chk
+	color_picker_menu_btn: color_picker_menu_btn	
+
+	Label:
+		id: rn_lbl
+		text: 'ROOT NOTE:'
+		font_size: root.font_sz
+		text_size: self.size
+		halign: 'left'
+		valign: 'bottom'
+		padding: 0, 4
+		size_hint: None, None			
+		size: 72, 18
+		pos: root.pos[0]+3, root.pos[1] + 23 + root.bottom_pad 
+		
+	USpinner:
+		id: root_note_spnr
+		values: root.root_val_list
+		background_color: root.btn_color
+		text: ''
+		markup: True
+		font_size: 11
+		text_size: self.size
+		halign: 'left'
+		valign: 'bottom'
+		padding: 4, 6	
+		size_hint: None, None				
+		size: 45, 20
+		pos: root.pos[0]+69, root.pos[1] + 23 + root.bottom_pad 
+		on_user_text: root.set_root_note(self.user_text) 
+		
+	Label:
+		text: 'OWN COLOR'
+		font_size: root.font_sz - 2
+		size: 72, 18
+		pos: root.pos[0] + 14, root.pos[1] + 5 + root.bottom_pad 
+		
+	CheckBox:
+		id: separate_color_chk
+		active: False
+		size: 16, 16
+		pos: root.pos[0] + 4, root.pos[1] + 5 + root.bottom_pad 	
+		on_state: root.color_magic(self.state)
+
+	HSVTColorMenuBtn:
+		id: color_picker_menu_btn
+		font_sz: root.font_sz
+		sample_color: root.root_color
+		size: 115, 45
+		pos: root.pos[0], root.pos[1]	
+
+	
+		
+<ScaleDisplay@Widget>:
+	font_sz: 11
+	bcolor: [.1, .1, .1, 1]	
+	btn_color: [.6, .6, .6, 1]  
+	init_color: [1, 1, 1, 0]	
+	scale_color: [1, 1, 1, 0]	
+	root_color: [1, 1, 1, 0]
+	h_light_order: 0
+	hdr_text: 'SCALE:'
+	h_light_on: False
+	root_note: ''
+	interval_str: ''
+	scale_name: ''
+	root_separate: False
+	
+	xpander: 0
+
+	hdr_toggle: hdr_toggle
+	apply_hlight_chk: apply_hlight_chk
+	root_select: root_select
+	name_disp: name_disp
+	interval_disp: interval_disp
+	
+	canvas:
+		Color:
+			rgba: root.bcolor
+		Rectangle:
+			size: self.size 
+			pos: self.pos
+			
+		Color:
+			rgba: [.5, .5, .5, .8]
+		Line:
+			width: 1
+			rectangle: self.x+1, self.y, 117, 215 + self.xpander 
+		Line:
+			width: 1
+			points: root.pos[0]+1, root.pos[1] + 195 + self.xpander, root.pos[0]+117, root.pos[1] + 195 + self.xpander
+
+		Line:
+			width: 1
+			points: root.pos[0]+1, root.pos[1] + 172 + self.xpander, root.pos[0]+117, root.pos[1] + 172 + self.xpander
+
+		Color:
+			rgba: [0, 0, 0, 1]
+		Rectangle:
+			size: 115, 20
+			pos: root.pos[0] + 2, root.pos[1] + 173 + root.xpander
+
+
+	# Label:
+		# id: hdr_lbl
+		# markup: True
+		# text: '[b]' + root.hdr_text + '[/b]'
+		# font_size: root.font_sz
+		# size: 110, 18
+		# pos: root.pos[0], root.pos[1] + 196 + root.xpander 
+	ToggleButton:
+		id: hdr_toggle
+		state: 'down' if root.h_light_on else 'normal'
+		markup: True
+		text: '[b]' + root.hdr_text + '[/b]'
+		font_size: root.font_sz
+		text_size: self.size
+		halign: 'center'
+		valign: 'middle'
+		size: 110, 18
+		pos: root.pos[0] + 4, root.pos[1] + 195 + root.xpander
+		on_release: root.apply(self.state)
+
+	CheckBox:
+		id: apply_hlight_chk
+		active: root.h_light_on #False
+		size: 16, 16
+		pos: root.pos[0] + 4, root.pos[1] + 176 + root.xpander 	
+		on_release: root.apply(self.state)
+
+	Label:
+		text: '[b]HIGHLIGHT[/b]'
+		markup: True
+		font_size: root.font_sz - 2
+		size: 52, 18
+		pos: root.pos[0] + 20, root.pos[1] + 175 + root.xpander  
+
+	Button:
+		id: reset_btn
+		background_color: root.btn_color
+		text: 'RESET'
+		font_size: root.font_sz - 2
+		text_size: self.size
+		halign: 'center'
+		valign: 'bottom'
+		padding: 6, 5
+		size: 40, 19
+		pos: root.pos[0]+74, root.pos[1] + 173 + root.xpander 
+		on_release: root.reset()
+
+	RootNoteSelector:
+		id: root_select
+		bcolor: root.bcolor
+		btn_color: root.btn_color
+		root_color: root.root_color
+		font_sz: root.font_sz
+		size: 117, 45 + root.xpander
+		on_resized_up: root.expand()
+		on_resized_down: root.shrink()
+		pos: root.pos[0] + 2, root.pos[1] + 125 
+		on_root_note: root.root_note = self.root_note
+		on_root_color: root.root_color = self.root_color 
+
+	Label:
+		text: 'NAME:'
+		font_size: root.font_sz
+		text_size: self.size
+		halign: 'left'
+		valign: 'bottom'
+		padding: 6, 2
+		size: 117, 18
+		pos: root.pos[0], root.pos[1] + 105 
+
+		
+	Button:
+		id: name_disp
+		background_color: root.btn_color
+		text: root.scale_name
+		font_size: root.font_sz
+		text_size: self.size
+		halign: 'center'
+		valign: 'bottom'
+		padding: 0, 4
+		size: 110, 18
+		pos: root.pos[0]+4, root.pos[1] + 85 
+		on_release: root.edit()
+		
+	Label:
+		text: 'INTERVAL STRING:'
+		font_size: root.font_sz
+		text_size: self.size
+		halign: 'left'
+		valign: 'bottom'
+		padding: 6, 2
+		size: 117, 18
+		pos: root.pos[0], root.pos[1] + 65 
+
+	Button:
+		id: interval_disp
+		background_color: root.btn_color
+		text: root.interval_str
+		font_size: root.font_sz
+		text_size: self.size
+		halign: 'center'
+		valign: 'bottom'
+		padding: 0, 4
+		size: 110, 18
+		pos: root.pos[0]+4, root.pos[1] + 45 
+		on_release: root.edit()
+		
+	HSVTColorMenuBtn:
+		id: color_picker_menu_btn
+		font_sz: root.font_sz
+		sample_color: root.scale_color
+		size: 117, 45
+		pos: root.pos[0], root.pos[1] 
+		
+		
+
+
+<ScaleHLightList@Widget>:
+	xpander: 0
+
+	ctrl_tabpanel_ref: None
+	scale_slctr1: scale_slctr1
+	scale_slctr2: scale_slctr2
+
+	ScaleDisplay:
+		id: scale_slctr1
+		ctrl_tabpanel_ref: root.ctrl_tabpanel_ref
+		hdr_text: 'SCALE #1'
+		h_light_order: 1
+		init_color: [0, 0, 1, .5]		
+		size: 118, 216 + self.xpander
+		pos: root.pos[0], root.pos[1] + (root.size[1] - 216 - scale_slctr1.xpander)
+		on_resized_up: root.xpander = self.xpander + scale_slctr2.xpander
+		on_resized_down: root.xpander = self.xpander + scale_slctr2.xpander	
+
+
+	ScaleDisplay:
+		id: scale_slctr2
+		ctrl_tabpanel_ref: root.ctrl_tabpanel_ref
+		hdr_text: 'SCALE #2'
+		h_light_order: 2
+		init_color: [1, 0, .1, .5]		
+		size: 118, 216 + self.xpander
+		pos: root.pos[0], root.pos[1] + max(0, (root.size[1] - 440 - scale_slctr1.xpander - scale_slctr2.xpander))
+		on_resized_up: root.xpander = self.xpander + scale_slctr1.xpander
+		on_resized_down: root.xpander = self.xpander + scale_slctr1.xpander	
+		
+
+	
+<ScaleHLightScroll@ScrollView>:
+	scroll_type: ['bars']
+	do_scroll_x: False
+	bar_pos_y: 'right'
+	bar_width: 5
+	bar_color: [.3, .3, .3, 1]
+	bar_inactive_color: [.35, .35, .35, 1]
+	
+	scale_list: scale_list	
+	ctrl_tabpanel_ref: None
+		
+	ScaleHLightList: 
+		id: scale_list	
+		size_hint_x: (root.width - root.bar_width)/(root.width + .001) #None
+		size_hint_y: None
+		height: str(440 + self.xpander) + 'sp'
+		ctrl_tabpanel_ref: root.ctrl_tabpanel_ref
+
+
+
+<SharpsHighlight@Widget>:	
+	ctrl_tabpanel_ref: None
+	transp_slider: transp_slider
+	transp_lbl: transp_lbl
+	sharps_btn: sharps_btn
+	accept_btn: accept_btn
+	reset_btn: reset_btn
+
+	ToggleButton:
+		id: sharps_btn
+		state: 'down'
+		text: 'HIGHLIGHT SHARPS'
+		font_size: 11
+		#pos: (root.pos[0]+2, root.pos[1] + 70)
+		pos: root.pos[0]+2, root.pos[1] + root.size[1] - 30
+		size: 115, 25
+		#on_release: root.highlight_sharps(self.state)
+		on_state: root.highlight_sharps(self.state)
+
+	Label:
+		id: transp_lbl
+		text_size: self.size
+		halign: 'left'
+		valign: 'bottom'
+		font_size: 10
+		text: 'VALUE: ' + str(100 - root.current_transp) 
+		size: 100, 16 	
+		#pos: (root.pos[0] + 5, root.pos[1] + 50)
+		pos: root.pos[0] + 5, root.pos[1] + root.size[1] - 46
+		
+	GradientSlider:
+		id: transp_slider
+		color_property: 'value'	#'hue', 'value', 'saturation', 'transparency'
+		texture_width: self.size[0] - 10
+		step: 1
+		size: 120, 20
+		#pos: (root.pos[0] - 3, root.pos[1] + 28)
+		pos: root.pos[0] - 3, root.pos[1] + root.size[1] - 68
+		value: 70
+		on_value: root.current_transp = 100 - int(self.value)
+
+	Button:
+		id: accept_btn
+		text: 'ACCEPT'
+		font_size: 10
+		text_size: self.size
+		halign: 'center'
+		valign: 'bottom'
+		padding: 6, 5
+		size: 54, 20
+		#pos: root.pos[0] + 4, root.pos[1] + 3
+		pos: root.pos[0] + 4, root.pos[1] + root.size[1] - 92
+		on_release: root.accept()
+
+	Button:
+		id: reset_btn
+		text: 'RESET'
+		font_size: 10
+		text_size: self.size
+		halign: 'center'
+		valign: 'bottom'
+		padding: 6, 5
+		size: 52, 20
+		#pos: root.pos[0] + 60, root.pos[1] + 3
+		pos: root.pos[0] + 60, root.pos[1] + root.size[1] - 92
+		on_release: root.reset()
+		
+		
+#-----------------------------------------
+
+<HighlightCtrlTab@BoxLayout>:
+	orientation: 'vertical'
+	spacing: 3
+	#[padding_left, padding_top, padding_right, padding_bottom]
+	padding: 0, 3, 0, 0
+
+	ctrl_tabpanel_ref: None
+	hightlight_accordion: hightlight_accordion
+	# scale_scroll: scale_scroll
+	# sharps_btn: sharps_btn
+
+	# ToggleButton:
+		# id: sharps_btn
+		# state: 'down'
+		# text: 'HIGHLIGHT SHARPS'
+		# font_size: 11
+		# text_size: self.size
+		# halign: 'center'
+		# valign: 'middle'
+		# size_hint: 1, .05
+		# on_release: root.highlight_sharps(self.state)
+
+	# ScaleHLightScroll:
+		# id: scale_scroll
+		# ctrl_tabpanel_ref: root.ctrl_tabpanel_ref
+		# size_hint: 1, .95
+
+	HLightAccordion:
+		id: hightlight_accordion
+		ctrl_tabpanel_ref: root.ctrl_tabpanel_ref
+		size_hint: 1, 1
+
+
+	#ChordSelector1	
+	#ChordSelector2
+#-----------------------------------------------------------------------------------

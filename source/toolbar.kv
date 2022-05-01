@@ -1,0 +1,372 @@
+#:kivy 2.0.0
+#:import Factory kivy.factory.Factory
+
+#good proportions: 
+#root [609.4499999999999, 30.48648648648648] [109.55, 533.5135135135134] 
+#file_btn [67.71666666666665, 27.437837837837833] [109.55, 533.5135135135134] 
+#grid_ctrl sz [270.8666666666666, 30.48648648648648]  pos  [177.26666666666665, 533.5135135135134] 
+#play_ctrl sz [135.4333333333333, 30.48648648648648]  pos  [448.13333333333327, 533.5135135135134]
+
+<Toolbar@BoxLayout>:
+	orientation: 'horizontal'
+	
+	top_level_ref: None
+	
+	file_btn: file_btn
+	grid_ctrl: grid_ctrl
+	play_ctrl: play_ctrl
+	
+	lbl_play_progress: lbl_play_progress		#keep???
+	
+	last_bar_num: 0
+	
+	Button:
+		id: file_btn
+		text: 'FILE'
+		#font_size: 10
+		dropdown: Factory.FileDropDown(caller=root)
+		on_release: self.dropdown.open(self)
+		size_hint: 0.11, .9
+		minimum_size: 56, 22
+		
+	GridControl:	
+		id: grid_ctrl
+		top_level_ref: root.top_level_ref
+		toolbar_ref: root
+		size_hint: 0.44, 1
+		minimum_size: 258, 20
+		
+		
+	PlayCtrl:
+		id: play_ctrl
+		top_level_ref: root.top_level_ref
+		toolbar_ref: root
+		size_hint: 0.2, 1
+		minimum_size: 92, 23
+	
+	Label:
+		id: lbl_play_progress
+		size_hint: 0.13, 1
+		text: ''
+		
+	Button:
+		id: btn1
+		size_hint: 0.1, 1
+		on_release: root.test_func()
+		
+# play_ctrl min_size [91.9888888888889, 23.621621621621617]  pos  [305.02222222222224, 413.37837837837833]		
+# play_ctrl good size [135.01399999999998, 32.43243243243243]
+# pause_btn sz [30, 29]  pos  [492.91249999999997, 567.5675675675675]
+# play_btn sz [30, 29]  pos  [525.9491666666667, 567.5675675675675]
+# stop_btn sz [30, 29]  pos  [558.9858333333333, 567.5675675675675]
+# section_btn sz [36, 29]  pos  [430.2301666666667, 567.5675675675675]
+		
+
+<PlayCtrl@Widget>:
+	h_sp: max((self.size[0] - 107)/5, 1)
+	h_pad: max((self.size[0] - 105 - 3*self.h_sp)/2, 1)
+	v_pad: max((self.size[1] - 25)/2, 1)
+	
+	top_level_ref: None
+	pause_btn: pause_btn
+	play_btn: play_btn
+	stop_btn: stop_btn
+	section_btn: section_btn
+	
+	last_bar_num: 0
+	
+	state: ""
+	progress: 0.0
+
+	canvas:
+		Color:
+			rgba: [.4, .4, .4, .7]
+		Line:
+			width: 1
+			rectangle: self.x+1, self.y+2, self.width-3, self.height-3
+				
+	Button:
+		id: pause_btn
+		
+		canvas.after:
+			Color:
+				rgba: [1, 1, 1, 1]
+			Rectangle:
+				pos: self.pos[0] + (self.size[0] - 10)/2,  self.pos[1] + (self.size[1] - 10)/2
+				size: 4, 10
+
+			Rectangle:
+				pos: self.pos[0] + (self.size[0] - 10)/2 + 6,  self.pos[1] + (self.size[1] - 10)/2
+				size: 4, 10
+				
+		background_normal: ''
+		background_color: [.3, .3, .3, 1]
+		minimum_size: 20, 20
+		size: 25, 25
+		pos: root.pos[0] + root.h_pad, root.pos[1] + root.v_pad
+		on_release: root.pause() 	
+				
+	Button:
+		id: play_btn
+
+		canvas.after:
+			Color:
+				rgba: [1, 1, 1, 1]
+			Triangle:
+				points: [self.pos[0] + (self.size[0] - 10)/2,  self.pos[1] + (self.size[1] - 10)/2, self.pos[0] + (self.size[0] - 10)/2,  self.pos[1] + (self.size[1] - 10)/2 + 10, self.pos[0] + (self.size[0] - 10)/2 + 10,  self.pos[1] + (self.size[1] - 10)/2 + 5]
+		
+		background_normal: ''
+		background_color: [.3, .3, .3, 1]	
+		minimum_size: 20, 20
+		size: 25, 25
+		pos: root.pos[0] + root.h_pad + root.h_sp + 25, root.pos[1] + root.v_pad
+		on_release: root.play()
+		
+	Button:
+		id: stop_btn
+		canvas.after:
+			Color:
+				rgba: [1, 1, 1, 1]
+			Rectangle:
+				pos: self.pos[0] + (self.size[0] - 10)/2,  self.pos[1] + (self.size[1] - 10)/2
+				size: 10, 10
+		
+		background_normal: ''
+		background_color: [.3, .3, .3, 1]
+		minimum_size: 20, 20
+		size: 25, 25
+		pos: root.pos[0] + root.h_pad + 2*root.h_sp + 50, root.pos[1] + root.v_pad
+		on_release: root.stop() 
+		
+	Button:
+		id: section_btn
+		markup: True
+		text: '[b]|<[size=26][sub]–[/sub][/size]>|[/b]'	
+		font_size: 12
+		background_normal: ''
+		background_color: [.3, .3, .3, 1]
+		minimum_size: 25, 20	#good min is 30, text wraps on width<25 
+		size: 30, 25
+		pos: root.pos[0] + root.h_pad + 3*root.h_sp + 75, root.pos[1] + root.v_pad
+		dropdown: Factory.SectionDropDown(caller=root)
+		on_release: self.dropdown.open(root)
+
+		
+<SectionDropDown@DropDown>:
+	spacing: 4
+	#[padding_left, padding_top, padding_right, padding_bottom]
+	padding: 0, 3, 0, 0
+
+	start_bar: start_bar
+	end_bar: end_bar
+	btn_ok: btn_ok
+	
+	canvas:
+		Color:
+			rgba: [.2, .2, .2, 1]	
+		Rectangle:
+			pos: self.pos
+			size: self.size
+			
+	Label:
+		id: lbl
+		text: 'PLAY SECTION:'
+		font_size: 12
+		size_hint_y: None
+		height: 20
+
+	SliderAdjuster:
+		id: start_bar
+		text: 'START BAR:'
+		min: 1
+		max: root.last_bar_num
+		box_step: 1
+		slide_step: 1
+		val: 1
+		digits: 4
+		size_hint_y: None
+		height: 60
+		
+	SliderAdjuster:
+		id: end_bar
+		text: 'END BAR:'
+		min: 1
+		max: root.last_bar_num
+		box_step: 1
+		slide_step: 1
+		val: root.last_bar_num
+		digits: 4
+		size_hint_y: None
+		height: 60
+		
+	Button:
+		id: btn_ok
+		text: 'OK'
+		font_size: 10
+		text_size: self.size
+		halign: 'center'
+		valign: 'middle'
+		width: root.width
+		size_hint_y: None
+		height: 18
+		on_press: root.select((start_bar.val, end_bar.val))
+		on_release: root.dismiss()			
+	
+	
+<ZoomCtrl@Widget>:
+	toolbar_ref: None
+	
+	zoom_out_btn: zoom_out_btn
+	zoom_lbl: zoom_lbl
+	zoom_in_btn: zoom_in_btn
+	
+	zoom_lvl: 0
+	h_pad: max((self.size[0] - 90)/2, 1)
+	v_pad: max((self.size[1] - 15)/2, 1)
+	
+	canvas:
+		Color:
+			rgba: [.4, .4, .4, .7]
+		Line:
+			width: 1
+			rectangle: self.x+1, self.y+2, self.width-3, self.height-3
+				
+	Button:
+		id: zoom_out_btn
+		text: '–'	#'—'
+		background_normal: ''
+		background_color: [.2, .2, .2, 1]
+		size: 15, 15
+		pos: root.pos[0] + root.h_pad, root.pos[1] + root.v_pad
+		on_press: root.zoom_lvl -= 1 if root.zoom_lvl > 0 else 0
+		on_release: root.toolbar_ref.zoom_out()
+
+	Label:
+		id: zoom_lbl
+		text: 'ZOOM: ' + str(root.zoom_lvl)
+		font_size: 12
+		text_size: self.size
+		halign: 'center'
+		valign: 'middle'
+		size: 56, 15
+		pos: root.pos[0] + 17 + root.h_pad, root.pos[1]  + root.v_pad		
+		
+	Button:
+		id: zoom_in_btn
+		text: '+'
+		background_normal: ''
+		background_color: [.2, .2, .2, 1]
+		size: 15, 15
+		pos: root.pos[0] + root.size[0] - 17 - root.h_pad, root.pos[1] + root.v_pad
+		on_press: root.zoom_lvl += 1 if root.zoom_lvl < 50 else 50
+		on_release: root.toolbar_ref.zoom_in() 
+
+		
+<GridControl@GridLayout>:
+	cols: 3
+	spacing: 2
+	#[padding_left, padding_top, padding_right, padding_bottom]
+	padding: 5
+	
+	top_level_ref: None
+	toolbar_ref: None
+	
+	editable_btn: editable_btn
+	zoom_ctrl: zoom_ctrl
+	show_keyboard_btn: show_keyboard_btn
+	
+	canvas:
+
+		Color:
+			rgba: [.4, .4, .4, .7]
+		Line:
+			width: 1
+			rectangle: self.x+1, self.y+2, self.width-3, self.height-3
+
+	ToggleButton:
+		id: editable_btn
+		text: 'SELECTABLE'
+		text_size: self.size
+		halign: 'center'
+		valign: 'middle'
+		size_hint: .37, .9		
+		on_state: root.toolbar_ref.switch_editable(self, self.state)
+		minimum_size: 96, 15
+
+	ZoomCtrl:
+		id: zoom_ctrl
+		toolbar_ref: root.toolbar_ref		
+		size_hint: 0.37, 1
+		minimum_size: 90, 20
+
+	ToggleButton:
+		id: show_keyboard_btn
+		state: 'down'
+		text: 'KEYBOARD'
+		font_size: 12
+		text_size: self.size
+		halign: 'center'
+		valign: 'middle'
+		size_hint: .26, .9
+		on_state: root.toolbar_ref.switch_keyboard(self, self.state)
+		minimum_size: 58, 15
+		
+		
+<FileDropDown@DropDown>:
+	spacing: 2
+	padding: 2
+
+	load_file: load_file
+	save_file: save_file
+	show_settings: show_settings
+	
+	canvas:
+		Color:
+			rgba: [.2, .2, .2, 1]	
+		Rectangle:
+			pos: self.pos
+			size: self.size	
+	
+	Button:
+		id: new_file
+		text: 'NEW'
+		font_size: 10
+		width: root.width
+		size_hint_y: None
+		height: '30dp'
+		on_press: root.caller.windows_new_file()
+		on_release: root.dismiss()
+		
+	Button:
+		id: load_file
+		text: 'LOAD'
+		font_size: 10
+		width: root.width
+		size_hint_y: None
+		height: '30dp'
+		#on_press: Factory.LoadDialog().open()
+		on_press: root.caller.windows_open_file()
+		on_release: root.dismiss()
+		
+	Button:
+		id: save_file
+		text: 'SAVE'
+		font_size: 10
+		width: root.width
+		size_hint_y: None
+		height: '30dp'
+		#on_press: Factory.SaveDialog().open()
+		on_press: root.caller.windows_save_file()
+		on_release: root.dismiss()
+		
+	Button:
+		id: show_settings
+		text: 'SETTINGS'
+		font_size: 10
+		width: root.width
+		size_hint_y: None
+		height: '30dp'
+		on_press: Factory.SettingsDialog(caller = root.caller, title = 'AppSettings').open()
+		on_release: root.dismiss()
+		
+		

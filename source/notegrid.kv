@@ -1,0 +1,911 @@
+#:kivy 2.0.0
+
+
+<Marker@Widget>:
+	top_level_ref: None
+	chn_color: [.2, .6, 1, 1]
+	canvas:
+		Color:
+			rgba: self.chn_color
+		Rectangle:
+			pos: self.pos
+			size: self.size
+
+#-----------------------------------------------------------------------------------
+
+<Note@Widget>:
+	chroma: 0
+	sharp: False
+	midinum: 0
+
+	key_pos_x: root.key_pos_x
+	bkg_alpha: 1
+	sharps_alpha: .3
+	keybrd_alpha: 1
+	hl1_color: [0, 0, 0, 0]
+	hl2_color: [0, 0, 0, 0]
+
+	text: ''
+	font_sz: root.font_sz
+	lbl_ctr_x: root.lbl_ctr_x
+	lbl_type: root.lbl_type
+	
+	canvas:
+		Color:
+			group: 'b_color'
+			rgba: [1, 1, 1, self.bkg_alpha]
+		Rectangle:
+			pos: self.pos
+			size: self.size
+
+		Color:
+			group: 'sharps'
+			rgba: [(1-int(self.sharp)), (1-int(self.sharp)), (1-int(self.sharp)), self.sharps_alpha * self.bkg_alpha] if self.sharp != None else [0, 0, 0, 0]
+		Rectangle:
+			pos: self.pos
+			size: self.size
+
+		Color:	
+			group: 'h_light1'
+			rgba: self.hl1_color
+		Rectangle:
+			pos: self.pos
+			size: self.size
+
+		Color:	
+			group: 'h_light2'
+			rgba: self.hl2_color
+		Rectangle:
+			pos: self.pos
+			size: self.size
+
+		Color:
+			group: 'keyboard'
+			rgba: [(1-int(self.sharp)), (1-int(self.sharp)), (1-int(self.sharp)), self.keybrd_alpha * self.bkg_alpha] if self.sharp != None else [0, 0, 0, 0]
+		Rectangle:
+			pos: self.key_pos_x, self.pos[1]
+			size: self.size[1]*4, self.size[1]
+
+	Label:
+		id: lbl_txt
+		font_size: root.font_sz
+		markup: True		
+		text: root.text if root.lbl_type == 0 else str(root.chroma)
+		color: [int(root.sharp)*root.keybrd_alpha, int(root.sharp)*root.keybrd_alpha, int(root.sharp)*root.keybrd_alpha, root.bkg_alpha]
+		size: self.texture_size
+		#center_y: root.y + root.height / 2
+		#center_x: root.lbl_ctr_x
+		padding_y: .5
+		pos: root.lbl_ctr_x, root.pos[1]
+
+
+<Octave@Widget>:
+	octnum: 0
+	font_sz: 8
+	lbl_ctr_x: 0 
+	key_pos_x: 0 
+	lbl_type: 0 
+	in_use: False
+	note_scroller_ref: None
+	note_stack: note_stack
+
+	note0: note0
+	note1: note1
+	note2: note2
+	note3: note3
+	note4: note4
+	note5: note5
+	note6: note6
+	note7: note7
+	note8: note8
+	note9: note9
+	note10: note10
+	note11: note11
+
+	canvas:
+		Color:
+			#rgba: [0, 0, 0, 0]	#transparent is 0
+			rgba: [.1, .1, .1, .5]
+		Rectangle:
+			pos: self.pos[0], self.pos[1] + 1
+			size: 16, self.size[1] - 2
+
+	Button:
+		canvas.after:
+			Color:
+				rgba: [.3, .3, .3, .7]
+			Line:
+				width: 1
+				rectangle: self.x, self.y, self.width-1, self.height-1
+				
+		id: x_button
+		background_normal: ''
+		background_color: [.2, .2, .2, .5]
+		text: '–'
+		font_size: 10
+		size: 15, 15
+		pos: root.pos[0], root.pos[1] + root.size[1] - 15
+		on_release: root.parent.collapse_octave(root)
+		
+	Label:
+		text: str(root.octnum)
+		size: 15, 15
+		font_size: 10
+		pos: root.pos[0], root.pos[1] + root.size[1] - 30
+		
+
+	StackLayout:
+		id: note_stack
+		orientation: 'bt-lr'
+		spacing: .5
+		padding: .5
+		pos: root.pos[0] + 16, root.pos[1]
+		size: root.size[0] - 16, root.size[1]
+		note_scroller_ref: root.note_scroller_ref
+		octnum: root.octnum
+		
+		Note:	# White Note
+			id: note0
+			size_hint: 1, 1/12
+			chroma:	0
+			midinum: self.chroma + 12*(root.octnum + 1)
+			sharp: False
+			text: 'C [size=' + str(int(self.font_sz*1.7)) + '][sub]' + str(root.octnum) + '[/sub][/size]'
+			font_sz: root.font_sz
+			key_pos_x: root.key_pos_x
+			lbl_ctr_x: root.lbl_ctr_x
+			lbl_type: root.lbl_type
+		Note:	# Black Note
+			id: note1
+			size_hint: 1, 1/12
+			chroma:	1
+			midinum: self.chroma + 12*(root.octnum + 1)
+			sharp: True
+			#bcolor:    [.8, .8, .8, 1]
+			#key_color:  [0, 0, 0]
+			text: 'C#[size=' + str(int(self.font_sz*1.7)) + '][sub]' + str(root.octnum) + '[/sub][/size]'
+			font_sz: root.font_sz
+			key_pos_x: root.key_pos_x
+			lbl_ctr_x: root.lbl_ctr_x
+			lbl_type: root.lbl_type
+		Note:	# White Note
+			id: note2
+			size_hint: 1, 1/12
+			chroma:	2
+			midinum: self.chroma + 12*(root.octnum + 1)
+			sharp: False
+			text: 'D [size=' + str(int(self.font_sz*1.7)) + '][sub]' + str(root.octnum) + '[/sub][/size]'
+			font_sz: root.font_sz
+			key_pos_x: root.key_pos_x
+			lbl_ctr_x: root.lbl_ctr_x
+			lbl_type: root.lbl_type
+		Note:	# Black Note
+			id: note3
+			size_hint: 1, 1/12
+			chroma:	3
+			midinum: self.chroma + 12*(root.octnum + 1)
+			sharp: True
+			#bcolor:    [.8, .8, .8, 1]
+			#key_color:  [0, 0, 0]
+			text: 'D#[size=' + str(int(self.font_sz*1.7)) + '][sub]' + str(root.octnum) + '[/sub][/size]'
+			font_sz: root.font_sz
+			key_pos_x: root.key_pos_x
+			lbl_ctr_x: root.lbl_ctr_x
+			lbl_type: root.lbl_type
+		Note:	# White Note
+			id: note4
+			size_hint: 1, 1/12
+			chroma:	4
+			midinum: self.chroma + 12*(root.octnum + 1)
+			sharp: False
+			text: 'E [size=' + str(int(self.font_sz*1.7)) + '][sub]' + str(root.octnum) + '[/sub][/size]'
+			font_sz: root.font_sz
+			key_pos_x: root.key_pos_x
+			lbl_ctr_x: root.lbl_ctr_x
+			lbl_type: root.lbl_type
+		Note:	# White Note
+			id: note5
+			size_hint: 1, 1/12
+			chroma:	5
+			midinum: self.chroma + 12*(root.octnum + 1)
+			sharp: False
+			text: 'F [size=' + str(int(self.font_sz*1.7)) + '][sub]' + str(root.octnum) + '[/sub][/size]'
+			font_sz: root.font_sz
+			key_pos_x: root.key_pos_x
+			lbl_ctr_x: root.lbl_ctr_x
+			lbl_type: root.lbl_type
+		Note:	# Black Note
+			id: note6
+			size_hint: 1, 1/12
+			chroma:	6
+			midinum: self.chroma + 12*(root.octnum + 1)
+			sharp: True
+			#bcolor:    [.8, .8, .8, 1]
+			#key_color:  [0, 0, 0]
+			text: 'F#[size=' + str(int(self.font_sz*1.7)) + '][sub]' + str(root.octnum) + '[/sub][/size]'
+			font_sz: root.font_sz
+			key_pos_x: root.key_pos_x
+			lbl_ctr_x: root.lbl_ctr_x
+			lbl_type: root.lbl_type
+		Note:	# White Note
+			id: note7
+			size_hint: 1, 1/12
+			chroma:	7
+			midinum: self.chroma + 12*(root.octnum + 1)
+			sharp: False
+			text: 'G [size=' + str(int(self.font_sz*1.7)) + '][sub]' + str(root.octnum) + '[/sub][/size]'
+			font_sz: root.font_sz
+			key_pos_x: root.key_pos_x
+			lbl_ctr_x: root.lbl_ctr_x
+			lbl_type: root.lbl_type
+		Note:	# Black Note
+			id: note8
+			size_hint: 1, 1/12
+			chroma:	8
+			midinum: self.chroma + 12*(root.octnum + 1)
+			sharp: True
+			#bcolor:    [.8, .8, .8, 1]
+			#key_color:  [0, 0, 0]
+			text: 'G#[size=' + str(int(self.font_sz*1.7)) + '][sub]' + str(root.octnum) + '[/sub][/size]'
+			font_sz: root.font_sz
+			key_pos_x: root.key_pos_x
+			lbl_ctr_x: root.lbl_ctr_x
+			lbl_type: root.lbl_type
+		Note:	# White Note
+			id: note9
+			size_hint: 1, 1/12
+			chroma:	9
+			midinum: self.chroma + 12*(root.octnum + 1)
+			sharp: False
+			text: 'A [size=' + str(int(self.font_sz*1.7)) + '][sub]' + str(root.octnum) + '[/sub][/size]'
+			font_sz: root.font_sz
+			key_pos_x: root.key_pos_x
+			lbl_ctr_x: root.lbl_ctr_x
+			lbl_type: root.lbl_type
+		Note:	# Black Note
+			id: note10
+			size_hint: 1, 1/12
+			chroma:	10
+			midinum: self.chroma + 12*(root.octnum + 1)
+			sharp: True
+			#bcolor:    [.8, .8, .8, 1]
+			#key_color:  [0, 0, 0]
+			text: 'A#[size=' + str(int(self.font_sz*1.7)) + '][sub]' + str(root.octnum) + '[/sub][/size]'
+			font_sz: root.font_sz
+			key_pos_x: root.key_pos_x
+			lbl_ctr_x: root.lbl_ctr_x
+			lbl_type: root.lbl_type
+		Note:	# White Note
+			id: note11
+			size_hint: 1, 1/12
+			chroma:	11
+			midinum: self.chroma + 12*(root.octnum + 1)
+			sharp: False
+			text: 'B [size=' + str(int(self.font_sz*1.7)) + '][sub]' + str(root.octnum) + '[/sub][/size]'
+			font_sz: root.font_sz
+			key_pos_x: root.key_pos_x
+			lbl_ctr_x: root.lbl_ctr_x
+			lbl_type: root.lbl_type
+
+
+		
+<PartialOct@Widget>:
+	octnum: 0
+	font_sz: 8
+	key_pos_x: 0 
+	lbl_ctr_x: 0 
+	lbl_type: 0 
+	in_use: False
+	note_scroller_ref: None
+	note_stack: note_stack
+
+	note0: note0
+	note1: note1
+	note2: note2
+	note3: note3
+	note4: note4
+	note5: note5
+	note6: note6
+	note7: note7
+	
+	canvas:
+		Color:
+			rgba: [.1, .1, .1, .5]
+		Rectangle:
+			pos: self.pos[0], self.pos[1] + 1
+			size: 16, self.size[1] - 2
+
+	Button:
+		canvas.after:
+			Color:
+				rgba: [.3, .3, .3, .7]
+			Line:
+				width: 1
+				rectangle: self.x, self.y, self.width-1, self.height-1
+				
+		id: x_button
+		background_normal: ''
+		background_color: [.2, .2, .2, .5]
+		text: '–' #'—'
+		font_size: 10
+		size: 15, 15
+		pos: root.pos[0], root.pos[1] + root.size[1] - 15
+		on_release: root.parent.collapse_octave(root)
+
+	Label:
+		text: str(root.octnum)
+		size: 15, 15
+		font_size: 10
+		pos: root.pos[0], root.pos[1] + root.size[1] - 30
+	
+	StackLayout:
+		id: note_stack
+		orientation: 'bt-lr'
+		spacing: .5
+		padding: .5
+		pos: root.pos[0] + 16, root.pos[1]
+		size: root.size[0] - 16, root.size[1]
+		note_scroller_ref: root.note_scroller_ref
+		octnum: root.octnum
+		
+		Note:	# White Note
+			id: note0
+			size_hint: 1, 1/8
+			chroma:	0
+			midinum: self.chroma + 12*(root.octnum + 1)
+			sharp: False
+			text: 'C [size=' + str(int(self.font_sz*1.7)) + '][sub]' + str(root.octnum) + '[/sub][/size]'
+			font_sz: root.font_sz
+			key_pos_x: root.key_pos_x
+			lbl_ctr_x: root.lbl_ctr_x
+			lbl_type: root.lbl_type
+		Note:	# Black Note
+			id: note1
+			size_hint: 1, 1/8
+			chroma:	1
+			midinum: self.chroma + 12*(root.octnum + 1)
+			sharp: True
+			#bcolor:    [.8, .8, .8, 1]
+			#key_color:  [0, 0, 0]
+			text: 'C#[size=' + str(int(self.font_sz*1.7)) + '][sub]' + str(root.octnum) + '[/sub][/size]'
+			font_sz: root.font_sz
+			key_pos_x: root.key_pos_x
+			lbl_ctr_x: root.lbl_ctr_x
+			lbl_type: root.lbl_type
+		Note:	# White Note
+			id: note2
+			size_hint: 1, 1/8
+			chroma:	2
+			midinum: self.chroma + 12*(root.octnum + 1)
+			sharp: False
+			text: 'D [size=' + str(int(self.font_sz*1.7)) + '][sub]' + str(root.octnum) + '[/sub][/size]'
+			font_sz: root.font_sz
+			key_pos_x: root.key_pos_x
+			lbl_ctr_x: root.lbl_ctr_x
+			lbl_type: root.lbl_type
+		Note:	# Black Note
+			id: note3
+			size_hint: 1, 1/8
+			chroma:	3
+			midinum: self.chroma + 12*(root.octnum + 1)
+			sharp: True
+			#bcolor:    [.8, .8, .8, 1]
+			#key_color:  [0, 0, 0]
+			text: 'D#[size=' + str(int(self.font_sz*1.7)) + '][sub]' + str(root.octnum) + '[/sub][/size]'
+			font_sz: root.font_sz
+			key_pos_x: root.key_pos_x
+			lbl_ctr_x: root.lbl_ctr_x
+			lbl_type: root.lbl_type
+		Note:	# White Note
+			id: note4
+			size_hint: 1, 1/8
+			chroma:	4
+			midinum: self.chroma + 12*(root.octnum + 1)
+			sharp: False
+			text: 'E [size=' + str(int(self.font_sz*1.7)) + '][sub]' + str(root.octnum) + '[/sub][/size]'
+			font_sz: root.font_sz
+			key_pos_x: root.key_pos_x
+			lbl_ctr_x: root.lbl_ctr_x
+			lbl_type: root.lbl_type
+		Note:	# White Note
+			id: note5
+			size_hint: 1, 1/8
+			chroma:	5
+			midinum: self.chroma + 12*(root.octnum + 1)
+			sharp: False
+			text: 'F [size=' + str(int(self.font_sz*1.7)) + '][sub]' + str(root.octnum) + '[/sub][/size]'
+			font_sz: root.font_sz
+			key_pos_x: root.key_pos_x
+			lbl_ctr_x: root.lbl_ctr_x
+			lbl_type: root.lbl_type
+		Note:	# Black Note
+			id: note6
+			size_hint: 1, 1/8
+			chroma:	6
+			midinum: self.chroma + 12*(root.octnum + 1)
+			sharp: True
+			#bcolor:    [.8, .8, .8, 1]
+			#key_color:  [0, 0, 0]
+			text: 'F#[size=' + str(int(self.font_sz*1.7)) + '][sub]' + str(root.octnum) + '[/sub][/size]'
+			font_sz: root.font_sz
+			key_pos_x: root.key_pos_x
+			lbl_ctr_x: root.lbl_ctr_x
+			lbl_type: root.lbl_type
+		Note:	# White Note
+			id: note7
+			size_hint: 1, 1/8
+			chroma:	7
+			midinum: self.chroma + 12*(root.octnum + 1)
+			sharp: False
+			text: 'G [size=' + str(int(self.font_sz*1.7)) + '][sub]' + str(root.octnum) + '[/sub][/size]'
+			font_sz: root.font_sz
+			key_pos_x: root.key_pos_x
+			lbl_ctr_x: root.lbl_ctr_x
+			lbl_type: root.lbl_type
+			
+
+<CollapsedOct@Widget>:
+	octnum: 0
+
+	canvas:
+		Color:
+			#rgba: [0, 0, 0, .2]	#transparency test
+			rgba: [0, 0, 0, .8]
+		Rectangle:
+			pos: self.pos[0] + 16, self.pos[1]
+			size: self.size[0] - 16, max(self.size[1], 16)
+			
+	Button:
+		canvas.after:
+			Color:
+				rgba: [.3, .3, .3, .7]
+			Line:
+				width: 1
+				rectangle: self.x, self.y, self.width-1, self.height-1
+				
+		id: x_button
+		background_normal: ''
+		background_color: [.2, .2, .2, .5]
+		text: '+'
+		font_size: 10
+		size: 15, 15
+		pos: root.pos[0], root.pos[1] + root.size[1] - 16
+		on_release: root.parent.expand_octave(root)
+
+	Label:
+		id: lbl
+		font_size: 10
+		size: max(root.size[0] * .1, 100), max(root.size[1], 16)
+		pos:  root.pos[0] + 20, root.pos[1]
+		text: 'OCTAVE ' + str(root.octnum) + ' (COLLAPSED)'
+
+	
+<Notegrid@BoxLayout>:
+	font_sz: 8
+	key_pos_x: 0
+	lbl_ctr_x: 0
+	lbl_type: 0
+	h_pad: 30
+	v_pad: 15
+	note_scroller_ref: None
+	
+	#[padding_left, padding_top, padding_right, padding_bottom].
+	padding: self.h_pad - 16, self.v_pad, self.h_pad, self.v_pad
+	orientation: 'vertical'
+	
+	oct9: oct9
+	oct8: oct8
+	oct7: oct7
+	oct6: oct6
+	oct5: oct5
+	oct4: oct4
+	oct3: oct3
+	oct2: oct2
+	oct1: oct1
+	oct0: oct0
+	oct_1: oct_1
+
+	canvas:
+		Color:
+			rgba: [0, 0, 0, 0]	
+			#rgba: [0, 0, 1, 1]	#transparency test
+		Rectangle:
+			pos: self.pos
+			size: self.size
+
+	PartialOct:
+		id: oct9
+		note_scroller_ref: root.note_scroller_ref
+		size_hint: 1, 8/128
+		octnum: 9
+		font_sz: root.font_sz
+		key_pos_x: root.key_pos_x
+		lbl_ctr_x: root.lbl_ctr_x
+		lbl_type: root.lbl_type
+		
+	Octave:
+		id: oct8
+		note_scroller_ref: root.note_scroller_ref
+		size_hint: 1, 12/128
+		octnum: 8
+		font_sz: root.font_sz
+		key_pos_x: root.key_pos_x
+		lbl_ctr_x: root.lbl_ctr_x
+		lbl_type: root.lbl_type
+		
+	Octave:
+		id: oct7
+		note_scroller_ref: root.note_scroller_ref
+		size_hint: 1, 12/128
+		octnum: 7
+		font_sz: root.font_sz
+		key_pos_x: root.key_pos_x
+		lbl_ctr_x: root.lbl_ctr_x
+		lbl_type: root.lbl_type
+		
+	Octave:
+		id: oct6
+		note_scroller_ref: root.note_scroller_ref
+		size_hint: 1, 12/128
+		octnum: 6
+		font_sz: root.font_sz
+		key_pos_x: root.key_pos_x
+		lbl_ctr_x: root.lbl_ctr_x
+		lbl_type: root.lbl_type
+		
+	Octave:
+		id: oct5
+		note_scroller_ref: root.note_scroller_ref
+		size_hint: 1, 12/128
+		octnum: 5
+		font_sz: root.font_sz
+		key_pos_x: root.key_pos_x
+		lbl_ctr_x: root.lbl_ctr_x
+		lbl_type: root.lbl_type
+		
+	Octave:
+		id: oct4
+		note_scroller_ref: root.note_scroller_ref
+		size_hint: 1, 12/128
+		octnum: 4
+		font_sz: root.font_sz
+		key_pos_x: root.key_pos_x
+		lbl_ctr_x: root.lbl_ctr_x
+		lbl_type: root.lbl_type
+		
+	Octave:
+		id: oct3
+		note_scroller_ref: root.note_scroller_ref
+		size_hint: 1, 12/128
+		octnum: 3
+		font_sz: root.font_sz
+		key_pos_x: root.key_pos_x
+		lbl_ctr_x: root.lbl_ctr_x
+		lbl_type: root.lbl_type
+		
+	Octave:
+		id: oct2
+		note_scroller_ref: root.note_scroller_ref
+		size_hint: 1, 12/128
+		octnum: 2
+		font_sz: root.font_sz
+		key_pos_x: root.key_pos_x
+		lbl_ctr_x: root.lbl_ctr_x
+		lbl_type: root.lbl_type
+		
+	Octave:
+		id: oct1
+		note_scroller_ref: root.note_scroller_ref
+		size_hint: 1, 12/128
+		octnum: 1
+		font_sz: root.font_sz
+		key_pos_x: root.key_pos_x
+		lbl_ctr_x: root.lbl_ctr_x
+		lbl_type: root.lbl_type
+		
+	Octave:
+		id: oct0
+		note_scroller_ref: root.note_scroller_ref
+		size_hint: 1, 12/128
+		octnum: 0
+		font_sz: root.font_sz
+		key_pos_x: root.key_pos_x
+		lbl_ctr_x: root.lbl_ctr_x
+		lbl_type: root.lbl_type
+		
+	Octave:
+		id: oct_1
+		note_scroller_ref: root.note_scroller_ref
+		size_hint: 1, 12/128
+		octnum: -1
+		font_sz: root.font_sz
+		key_pos_x: root.key_pos_x
+		lbl_ctr_x: root.lbl_ctr_x
+		lbl_type: root.lbl_type
+
+
+#-----------------------------------------------------------------------------------					
+<SilentMessageOverlay@Widget>:
+	font_sz: 8
+	key_pos_x: 0
+	lbl_ctr_x: 0
+	lbl_type: 0
+	h_pad: 30
+	v_pad: 15
+	note_scroller_ref: None
+
+	##visibility test
+	# canvas:
+		# Color:
+			# rgba: [.2, .6, 1, .5]
+		# Rectangle:
+			# pos: self.pos
+			# size: self.size 
+#-----------------------------------------------------------------------------------					
+<LinedOverlay@Widget>:
+	font_sz: 8
+	key_pos_x: 0
+	lbl_ctr_x: 0
+	lbl_type: 0
+	h_pad: 30
+	v_pad: 15
+	note_scroller_ref: None
+	
+	##visibility test
+	# canvas:
+		# Color:
+			# rgba: [0, 1, 0, .5]
+		# Rectangle:
+			# pos: self.pos
+			# size: self.size 
+#-----------------------------------------------------------------------------------					
+
+
+<LinedNoteGrid@Widget>:
+	font_sz: 8
+	key_pos_x: 0
+	lbl_ctr_x: 0
+	lbl_type: 0
+	h_pad: 30
+	v_pad: 15
+	x_divs: [0]
+	cont_sz_x: 1920
+	cont_sz_y: 128
+	bar_length: 96	#ticks_major is in dp, so counts double
+	beat_length: 24	#ticks_major/ticks_minor in dp, so counts double
+	
+	note_grid: note_grid
+	silent_messages: silent_messages
+	grid_lines: grid_lines
+	note_scroller_ref: None
+		
+	Notegrid:
+		id: note_grid
+		note_scroller_ref: root.note_scroller_ref
+		pos: root.pos
+		size: root.size
+		font_sz: root.font_sz
+		h_pad: root.h_pad
+		v_pad: root.v_pad
+		key_pos_x: root.key_pos_x
+		lbl_ctr_x: root.lbl_ctr_x
+		lbl_type: root.lbl_type
+		
+	SilentMessageOverlay:
+		id: silent_messages
+		note_scroller_ref: root.note_scroller_ref
+		pos: root.pos
+		size: root.size		
+
+	LinedOverlay:
+		id: grid_lines
+		note_scroller_ref: root.note_scroller_ref
+		pos: root.pos
+		size: root.size	
+		
+	
+<TrackTabbedPanel@TabbedPanel>:
+	do_default_tab: False
+	#tab_pos: 'top_left'
+	tab_height: 20
+	tab_width: None
+	
+	cont_sz_x: 1920
+	cont_sz_y: 128
+	font_sz: 8
+	key_pos_x: 0
+	lbl_ctr_x: 0
+	lbl_type: 0
+	h_pad: 30
+	v_pad: 15
+	tab_strip_height: 26 #when tab_height=20
+	first_tab: first_tab
+	lined_note_grid: lined_note_grid
+	note_scroller_ref: None
+	top_level_ref: None
+	
+
+	AutoSizedTabItem:
+		id: first_tab
+		text: 'Track' 
+		font_size: 14
+		shorten: False
+		
+		LinedNoteGrid:
+			id: lined_note_grid
+
+			note_scroller_ref: root.note_scroller_ref
+			font_sz: root.font_sz
+			h_pad: root.h_pad
+			v_pad: root.v_pad
+			key_pos_x: root.key_pos_x
+			lbl_ctr_x: root.lbl_ctr_x
+			lbl_type: root.lbl_type	
+			cont_sz_y: root.cont_sz_y
+			cont_sz_x: root.cont_sz_x
+			
+			size: root.size[0], root.size[1]-root.tab_strip_height
+
+			
+<NoteScroll@ScrollView>:
+	cont_sz_x: 1920
+	cont_sz_y: 128
+	int_grid_width: int(self.cont_sz_x * self.cont_sz_mult_x) + self.h_pad * 2
+	int_grid_height: int(self.cont_sz_y * self.cont_sz_mult_y) + self.v_pad * 2 + 26 
+	grid_sz_x: str(self.int_grid_width) + 'sp'		
+	grid_sz_y: str(self.int_grid_height) + 'sp' 	
+	font_sz: 8
+	h_pad: 30
+	v_pad: 15
+	tab_strip_height: 26	#when TrackTabbedPanel.tab_height=20
+	key_pos_x: self.h_pad + 2
+	lbl_ctr_x: self.h_pad * 1.5
+	lbl_type: 0
+	visual_track_lst: []
+	
+	top_level_ref: None
+	track_tabs: track_tabs
+	
+	scroll_type: ['bars']
+	bar_pos_x: 'bottom'
+	bar_pos_y: 'right'
+	bar_width: 9
+	bar_color: [.3, .3, .3, 1]
+	bar_inactive_color: [.35, .35, .35, 1]
+	scroll_y: .50
+
+	TrackTabbedPanel:
+		id: track_tabs
+		size_hint_x: None
+		size_hint_y: None	
+		width: root.grid_sz_x	
+		height: root.grid_sz_y	
+		
+		top_level_ref: root.top_level_ref
+		note_scroller_ref: root
+		cont_sz_y: root.cont_sz_y
+		cont_sz_x: root.cont_sz_x
+		font_sz: root.font_sz
+		h_pad: root.h_pad
+		v_pad: root.v_pad
+		tab_strip_height: root.tab_strip_height
+		key_pos_x: root.key_pos_x
+		lbl_ctr_x: root.lbl_ctr_x
+		lbl_type: root.lbl_type
+		
+
+		
+		
+#-----------------------------------------------------------------------------------	
+
+<TickLabel@Label>:
+	background_color: [0, 0, 0, 1]
+	canvas.before:
+		Color:
+			rgba: root.background_color
+		Rectangle:
+			size: self.size
+			pos: self.pos
+			
+	font_size: 10
+
+
+<Timeline@Widget>:
+	slide_min: 0 
+	slide_max: 960 
+	ticks_major: 96		#actually 96, ticks_major is in dp, so counts double 
+	ticks_minor: 4
+	slide_value: 0
+	slide_width: self.width
+	h_pad: 30
+	top_level_ref: None
+	ticker: ticker
+	label_holder: label_holder
+	
+	user_seek: False
+	
+	Button:
+		id: add_left
+		size: 15, 15
+		pos: (root.pos[0] + 5, root.pos[1] + 6)
+		text: '+'
+		font_size: 10
+		on_release: root.add_time_left()
+				
+	TickSlider:
+		id: ticker
+		
+		min: root.slide_min 
+		max: root.slide_max 
+		value: root.slide_value	
+		cursor_width: '10sp'
+		cursor_height: '10sp'
+		value_track: True		
+		value_track_color: [.2, .6, 1]
+		value_track_width: '2dp'
+		
+		ticks_major: root.ticks_major
+		ticks_minor: root.ticks_minor
+
+		width: str(root.slide_width) + 'sp'
+		height: root.height
+		pos: (root.pos[0] + int(root.h_pad * .5), root.pos[1])
+		on_touch_down: root.user_seek = True
+		on_value_pos: foo = root.user_is_seeking(round(200.0*self.value/(root.slide_width-root.h_pad), 3)) if root.user_seek else 0
+		on_touch_up: foo = root.user_done_seeking(round(200.0*self.value/(root.slide_width-root.h_pad), 3)) if root.user_seek else 0
+		
+	Widget:
+		id: label_holder
+		
+		width: str(root.slide_width) + 'sp'
+		height: root.height
+		pos: (root.pos[0] + int(root.h_pad * .5), root.pos[1])
+	
+	Button:
+		id: add_right
+		size: 15, 15
+		pos: (root.pos[0] + root.slide_width + root.h_pad - 20, root.pos[1] + 6)
+		text: '+'
+		font_size: 10
+		on_release: root.add_time_right()
+
+	
+<TimelineScroll@ScrollView>:	
+	do_scroll_y: False
+	scroll_type: ['bars']
+	bar_pos_x: 'top'
+	bar_width: 1
+	bar_color: [.3, .3, .3, 1]
+	bar_inactive_color: [.35, .35, .35, 1]
+
+	h_pad: 30	
+	cont_sz_x: 1920
+	int_grid_width: self.cont_sz_x + self.h_pad * 2		
+	grid_sz_x: str(self.int_grid_width) + 'sp' 
+	slide_min: 0 
+	slide_max: 960 
+	ticks_major: 96		##actually 96, ticks_major is in dp, so counts double
+	ticks_minor: 4
+	slide_value: 0
+	time_line: time_line
+	top_level_ref: None
+	
+	Timeline: 
+		id: time_line	
+		size_hint_x: None	
+		width: root.grid_sz_x
+		
+		top_level_ref: root.top_level_ref
+		slide_min: root.slide_min
+		slide_max: root.slide_max 
+		ticks_major: root.ticks_major 
+		ticks_minor: root.ticks_minor
+		slide_value: root.slide_value
+		h_pad: root.h_pad
+		slide_width: root.int_grid_width - root.h_pad  #str(root.int_grid_width - int(root.h_pad * .5)) + 'sp' 
+	
+	
+
+
+
+	

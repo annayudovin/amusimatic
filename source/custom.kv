@@ -1,0 +1,638 @@
+#:kivy 2.0.0
+
+#:set IMG_PATH 'img/'
+
+<AdjusterBox@Widget>:
+	val: 0
+	min: 0
+	max: 10
+	step: 1
+	power_of_2: False
+	digits: 2	
+	hpad: 2
+	vpad: 3
+	x_pos: (self.size[0] - (32 + self.digits * 10 + self.hpad * 2)) / 2
+
+	Button:
+		canvas.after:
+			Color:
+				rgba: [.4, .4, .4, .7]
+			Line:
+				width: 1
+				rectangle: self.x, self.y, self.width-1, self.height-1
+				
+		id: subtract
+		background_normal: ''
+		background_color: [.3, .3, .3, .5]
+		size: 15, 15
+		pos: (root.pos[0] + root.x_pos + root.hpad, root.pos[1] + root.vpad)
+		text: '–'
+		font_size: 10
+		on_release: root.decrement()		
+			
+	Label:	
+		id: display
+		size: root.digits * 10, 20
+		pos: (root.pos[0] + root.x_pos + 16 + root.hpad, root.pos[1]) # + root.vpad)
+		text: str(root.val)
+		
+	Button:
+		canvas.after:
+			Color:
+				rgba: [.4, .4, .4, .7]
+			Line:
+				width: 1
+				rectangle: self.x, self.y, self.width-1, self.height-1
+				
+		id: add
+		background_normal: ''
+		background_color: [.3, .3, .3, .5]
+		size: 15, 15
+		pos: (root.pos[0] + root.x_pos + 16 + root.digits * 10 + root.hpad * 2, root.pos[1] + root.vpad)
+		text: '+'
+		font_size: 10
+		on_release: root.increment()		
+			
+		
+<SliderAdjuster@Widget>
+	bcolor: [.2, .2, .2, 1]
+	text: ''	
+	min: 0
+	max: 0	
+	box_step: 1	
+	slide_step: 1
+	val: 0
+	digits: 1
+	ctrl_tabpanel_ref: None
+	adjuster_box: adjuster_box
+	slider: slider
+	
+	canvas:
+		Color:
+			rgba: self.bcolor	
+		Rectangle:
+			pos: self.pos
+			size: self.size
+					
+	Label:
+		id: title
+		text: root.text
+		font_size: 10
+		size: max(root.size[0], 98), 24 
+		pos: (root.pos[0], root.pos[1] + 36)
+		
+	AdjusterBox:
+		id: adjuster_box
+		val: root.val
+		min: root.min
+		max: root.max
+		step: root.box_step
+		power_of_2: False
+		digits: root.digits
+		size: max(root.size[0], 98), 18 
+		pos: (root.pos[0], root.pos[1] + 18)
+		on_val: root.on_adjuster_val(self, self.val)	
+		
+		
+	Slider:
+		id: slider
+		min: root.min
+		max: root.max
+		step: root.slide_step
+		value: root.val
+		cursor_width: '10sp'
+		cursor_height: '10sp'
+		size: max(root.size[0], 98), 18 
+		pos: root.pos
+		on_value: root.on_slider_value(self, self.value)
+
+
+<VolumeAdjuster@Widget>
+	bcolor: [.2, .2, .2, 1]
+	h_pad: (root.size[0] - 98)/2
+	ctrl_tabpanel_ref: None
+	text: 'VOLUME'
+	val: 0
+	group_name: None
+	absolute_selected: False
+	vol_adjuster: vol_adjuster
+	adj_type_label: adj_type_label
+	
+	canvas:
+		Color:
+			rgba: self.bcolor	
+		Rectangle:
+			pos: self.pos
+			size: self.size
+
+	SliderAdjuster:
+		id: vol_adjuster
+		ctrl_tabpanel_ref: root.ctrl_tabpanel_ref
+		text: root.text
+		min: 0
+		max: 127
+		box_step: 1
+		slide_step: 5
+		val: root.val
+		digits: 3
+		size: max(root.size[0], 98), 60
+		pos: (root.pos[0], root.pos[1] + 23)
+		on_val: root.on_adjuster_val(root.vol_adjuster, self.val)
+
+	CheckBox:
+		id: chk_relative
+		group: root.group_name
+		allow_no_selection: False
+		state: 'normal' if root.absolute_selected else 'down' 
+		size: 16, 16
+		pos: (root.pos[0] + 2 + root.h_pad, root.pos[1] + 4)
+		on_active: root.absolute_selected = False
+		
+	Label:
+		id: adj_type_label
+		#text: 'ABSOLUTE'
+		text: 'RELATIVE'
+		font_size: 10
+		size: 62, 16
+		pos: (root.pos[0] + 18 + root.h_pad, root.pos[1] + 4)
+		
+	CheckBox:
+		id: chk_absolute
+		group: root.group_name
+		allow_no_selection: False
+		state: 'down' if root.absolute_selected else 'normal'
+		size: 16, 16
+		pos: (root.pos[0] + 80 + root.h_pad, root.pos[1] + 4)
+		on_active: root.absolute_selected = True
+		
+#-----------------------------------------------------------------------------------
+#-------------CUSTOM COLOR PICKERS--------------------------------------------------
+	
+<-GradientSlider@Slider>:
+	orientation: 'horizontal'
+	cursor_width: '5sp'
+	cursor_height: '20sp'
+	min: 1 if root.color_property == 'hue' else 0
+	max: 360 if root.color_property == 'hue' else 100
+	canvas:
+		Color:
+			rgb: 1, 1, 1
+		BorderImage:
+			border: self.border_horizontal
+			pos: self.x + self.padding, self.center_y - self.background_width / 2
+			size: self.width - self.padding * 2, self.background_width
+			texture: self.texture 
+			
+		Color:
+			rgba: root.value_track_color if self.value_track else [1, 1, 1, 0]
+		Line:
+			width: self.value_track_width
+			points: self.x + self.padding, self.center_y, self.value_pos[0], self.center_y
+		
+	Image:
+		pos: root.value_pos[0] - root.cursor_width / 2, root.center_y - root.cursor_height / 2
+		size: root.cursor_size
+		source: IMG_PATH + 'slider_cursor_n.png'
+		allow_stretch: True
+		keep_ratio: False
+
+			
+<HSVColorPicker@Widget>:	
+	sample_color: [1, 1, 1, 1]
+	display_color: [1, 1, 1, 1]
+	text_mode: 'full' #'abbreviated'
+	
+	h_slider: h_slider
+	s_slider: s_slider
+	v_slider: v_slider
+	separator: separator
+
+	Label:
+		id: title
+		text_size: self.size
+		halign: 'left'
+		valign: 'middle'
+		font_size: 12
+		text: 'COLOR:'
+		size: 60, 20 
+		pos: (root.pos[0] + 5, root.pos[1] + 130)
+
+	Label:
+		id: instruction
+		text_size: self.size
+		halign: 'left'
+		valign: 'middle'
+		font_size: 8
+		text: 'CLICK TO SELECT'
+		size: 80, 10 
+		pos: (root.pos[0] + 5, root.pos[1] + 120)
+		
+	Button:
+		id: select_button
+		background_normal: ''
+		background_color: root.display_color
+		size: 30, 30  
+		pos: (root.pos[0] + 80, root.pos[1] + 120)
+		on_release: root.accept()
+
+	Widget:
+		id: separator
+		canvas:
+			Color:
+				group: 'separator'			
+				rgba: [1, 1, 1, .5]
+
+			Line:
+				group: 'separator'			
+				points: [self.pos[0] + 3, int(self.pos[1])+.284, self.pos[0] + self.size[0] - 3, int(self.pos[1])+.284]
+				width: 1
+
+		size: 110, 2
+		pos: (root.pos[0] + 3, root.pos[1] + 112)
+
+	Label:
+		id: h_display
+		text_size: self.size
+		halign: 'left'
+		valign: 'bottom'
+		font_size: 10
+		text: 'HUE: ' + str(int(h_slider.value)) if root.text_mode == 'full' else 'H: ' + str(int(h_slider.value))	
+		size: 100, 16 
+		pos: (root.pos[0] + 5, root.pos[1] + 96)
+		
+	GradientSlider:
+		id: h_slider
+		color_property: 'hue'	#'hue', 'value', 'saturation'
+		texture_width: self.size[0] - self.double_padding
+		size: 120, 20 
+		pos: (root.pos[0] - 5, root.pos[1] + 76)
+		on_value: root.current_h = self.value		
+	
+	Label:
+		id: s_display
+		text_size: self.size
+		halign: 'left'
+		valign: 'bottom'
+		font_size: 10
+		text: 'SATURATION: ' + str(int(s_slider.value)) if root.text_mode == 'full' else 'S: ' + str(int(s_slider.value))
+		size: 100, 16 	
+		pos: (root.pos[0] + 5, root.pos[1] + 60)
+		
+	GradientSlider:
+		id: s_slider	
+		color_property: 'saturation'	#'hue', 'value', 'saturation'
+		sample_hue: root.current_h 
+		texture_width: self.size[0] - self.double_padding
+		size: 120, 20 
+		pos: (root.pos[0] - 5, root.pos[1] + 40)
+		on_value: root.current_s = self.value
+		
+	Label:
+		id: v_display
+		text_size: self.size
+		halign: 'left'
+		valign: 'bottom'
+		font_size: 10
+		text: 'VALUE: ' + str(int(v_slider.value)) if root.text_mode == 'full' else 'V: ' + str(int(v_slider.value))
+		size: 100, 16 	
+		pos: (root.pos[0] + 5, root.pos[1] + 25)
+		
+	GradientSlider:
+		id: v_slider
+		color_property: 'value'	#'hue', 'value', 'saturation'
+		texture_width: self.size[0] - self.double_padding 
+		size: 120, 20
+		pos: (root.pos[0] - 5, root.pos[1] + 5)
+		on_value: root.current_v = self.value 
+
+
+	
+<HSVColorPickerDropDown@DropDown>:
+	width: 120
+	size_hint_y: None
+	size_hint_x: None
+	sample_color: [1, 1, 1, 1]
+	bcolor: [.15, .15, .15, 1]
+	color_picker: color_picker
+
+	canvas:
+		Color:
+			rgba: self.bcolor	
+		Rectangle:
+			pos: self.pos
+			size: self.size
+			
+		Color:
+			rgba: [.3, .3, .3, .7]
+		Line:
+			width: 1
+			rectangle: self.x, self.y, self.width-1, self.height-1
+
+	
+	HSVColorPicker:
+		id: color_picker
+		sample_color: root.sample_color
+		dropdown_ref: root
+		size_hint_y: None
+		size_hint_x: None
+		width: 120
+		height: 158	
+
+
+
+<HSVTColorPicker@Widget>:	
+	sample_color: [1, 1, 1, 1]
+	display_color: [1, 1, 1, 1]
+	bcolor: [0, 0, 0, 0]
+	
+	text_mode: 'full' #'abbreviated'
+
+	dropdown_ref: None
+	
+	h_slider: h_slider
+	s_slider: s_slider
+	v_slider: v_slider
+	t_slider: t_slider
+	separator: separator
+
+	HSVTColorMenuHdr:
+		sample_color: root.display_color
+		bcolor: root.bcolor
+		sub_text: 'CLICK TO SELECT'	
+		font_sz: 12	
+		callback: root.accept
+		pos: root.pos[0]-2, root.pos[1] + 150
+		size: 120, 40	
+	
+	Widget:
+		id: separator
+		canvas:
+			Color:
+				group: 'separator'			
+				rgba: [1, 1, 1, .5]
+
+			Line:
+				group: 'separator'			
+				points: [self.pos[0] + 3, int(self.pos[1])+.284, self.pos[0] + self.size[0] - 3, int(self.pos[1])+.284]
+				width: 1
+
+		size: 110, 2
+		pos: (root.pos[0] + 3, root.pos[1] + 148)
+		
+		
+		
+	Label:
+		id: t_display
+		text_size: self.size
+		halign: 'left'
+		valign: 'bottom'
+		font_size: 10
+		text: 'TRANSPARENCY: ' + str(int(t_slider.value)) if root.text_mode == 'full' else 'T: ' + str(int(t_slider.value))	
+		size: 100, 16 
+		pos: (root.pos[0] + 5, root.pos[1] + 132)
+		
+	GradientSlider:
+		id: t_slider	
+		color_property: 'transparency'	#'hue', 'value', 'saturation', 'transparency'
+		sample_rgb: root.display_color 
+		texture_width: self.size[0] - self.double_padding
+		size: 120, 20 
+		pos: (root.pos[0] - 5, root.pos[1] + 112)
+		on_value: root.current_t = self.value	
+		
+
+	Label:
+		id: h_display
+		text_size: self.size
+		halign: 'left'
+		valign: 'bottom'
+		font_size: 10
+		text: 'HUE: ' + str(int(h_slider.value)) if root.text_mode == 'full' else 'H: ' + str(int(h_slider.value))	
+		size: 100, 16 
+		pos: (root.pos[0] + 5, root.pos[1] + 96)
+		
+	GradientSlider:
+		id: h_slider
+		color_property: 'hue'	#'hue', 'value', 'saturation', 'transparency'
+		texture_width: self.size[0] - self.double_padding
+		size: 120, 20 
+		pos: (root.pos[0] - 5, root.pos[1] + 76)
+		on_value: root.current_h = self.value		
+	
+	Label:
+		id: s_display
+		text_size: self.size
+		halign: 'left'
+		valign: 'bottom'
+		font_size: 10
+		text: 'SATURATION: ' + str(int(s_slider.value)) if root.text_mode == 'full' else 'S: ' + str(int(s_slider.value))
+		size: 100, 16 	
+		pos: (root.pos[0] + 5, root.pos[1] + 60)
+		
+	GradientSlider:
+		id: s_slider	
+		color_property: 'saturation'	#'hue', 'value', 'saturation', 'transparency'
+		sample_hue: root.current_h 
+		texture_width: self.size[0] - self.double_padding
+		size: 120, 20 
+		pos: (root.pos[0] - 5, root.pos[1] + 40)
+		on_value: root.current_s = self.value
+		
+	Label:
+		id: v_display
+		text_size: self.size
+		halign: 'left'
+		valign: 'bottom'
+		font_size: 10
+		text: 'VALUE: ' + str(int(v_slider.value)) if root.text_mode == 'full' else 'V: ' + str(int(v_slider.value))
+		size: 100, 16 	
+		pos: (root.pos[0] + 5, root.pos[1] + 25)
+		
+	GradientSlider:
+		id: v_slider
+		color_property: 'value'	#'hue', 'value', 'saturation', 'transparency'
+		texture_width: self.size[0] - self.double_padding 
+		size: 120, 20
+		pos: (root.pos[0] - 5, root.pos[1] + 5)
+		on_value: root.current_v = self.value 
+
+
+<HSVTColorMenuHdr@Widget>:
+	sample_color: [0,0,0,0]
+	size: 115, 45
+	sub_text: 'CLICK TO CHANGE'
+	font_sz: 12
+	callback: None
+	
+	Label:
+		id: title
+		text_size: self.size
+		halign: 'left'
+		valign: 'middle'
+		font_size: root.font_sz
+		text: 'COLOR:'
+		size: 60, 20 
+		pos: (self.parent.pos[0] + 5, self.parent.pos[1] + 20)
+
+	Label:
+		id: instruction
+		text_size: self.size
+		halign: 'left'
+		valign: 'middle'
+		font_size: 8
+		text: root.sub_text
+		size: 80, 10 
+		pos: (self.parent.pos[0] + 5, self.parent.pos[1] + 10)
+	
+	Image:
+		source: IMG_PATH + 'cmykrgb.png'
+		size: 38, 38
+		pos: (self.parent.pos[0] + 74, self.parent.pos[1] + 5)
+	
+	Button:
+		id: select_button
+		background_normal: ''
+		background_color: root.sample_color
+		size: 30, 30  
+		text: 'test'
+		color: [(1-root.sample_color[0]), (1-root.sample_color[1]), (1-root.sample_color[2]), root.sample_color[3]] #opposite RGB value, same transparency
+		pos: (self.parent.pos[0] + 78, self.parent.pos[1] + 9)
+		on_release: root.callback()
+		
+			
+<HSVTColorMenuBtn@Widget>:
+	sample_color: [0,0,0,0]
+	bcolor: [0,0,0,0]
+	size: 115, 45
+	sub_text: 'CLICK TO CHANGE'
+	font_sz: 12
+
+	
+	Button:
+		pos: root.pos
+		size: root.size
+		background_color: root.bcolor
+		on_release: root.edit()
+
+		Widget:
+			pos: root.pos
+			size: root.size
+			
+			HSVTColorMenuHdr:
+				sample_color: root.sample_color
+				bcolor: root.bcolor
+				sub_text: root.sub_text	
+				font_sz: root.font_sz
+				callback: root.edit
+				pos: root.pos
+				size: root.size
+
+
+	
+<HSVTColorDropDown@DropDown>:
+
+	size_hint_y: None
+	size_hint_x: None
+	sample_color: [1, 1, 1, 1]
+	bcolor: [.15, .15, .15, 1]
+	color_picker: color_picker
+	auto_width: False
+	width: 115
+	
+	canvas:
+		Color:
+			rgba: self.bcolor
+		Rectangle:
+			pos: self.pos
+			size: self.size
+			
+		Color:
+			rgba: [.3, .3, .3, .7]
+		Line:
+			width: 1
+			rectangle: self.x, self.y, self.width-1, self.height-1
+	
+	HSVTColorPicker:
+		id: color_picker
+		sample_color: root.sample_color
+		dropdown_ref: root
+		size_hint_y: None
+		size_hint_x: None
+		width: 115
+		height: 200		
+
+
+#-----------------------------------------------------------------------------------
+
+	
+<SpinnerOption@Button>:
+	padding: 2, 4
+	font_size: 10
+	text_size: self.size
+	markup: True
+	halign: 'left'
+	valign: 'bottom'
+	height: 18
+	background_normal: ''
+	color: 0,0,0,1
+	user_text: ''
+
+#-----------------------------------------------------------------------------------		
+
+	
+#-----------------------------------------------------------------------------------
+
+<-AccordionItem>:
+	container: container
+	container_title: container_title
+
+	BoxLayout:
+		orientation: root.orientation
+		pos: root.pos
+		BoxLayout:
+			size_hint_x: None if root.orientation == 'horizontal' else 1
+			size_hint_y: None if root.orientation == 'vertical' else 1
+			width: 20 if root.orientation == 'horizontal' else 100
+			height: 20 if root.orientation == 'vertical' else 100
+			id: container_title
+
+		StencilView:
+			id: sv
+
+			BoxLayout:
+				id: container
+				pos: sv.pos
+				size: root.content_size
+
+
+<HLightAccordion@DrawerAccordion>:
+	orientation: 'vertical'
+	min_space: '20dp'
+
+	ctrl_tabpanel_ref: None
+	scale_scroll: scale_scroll
+	sharps_ctrl: sharps_ctrl
+
+	DrawerAccordionItem:
+		title: 'SHARPS'
+		SharpsHighlight:
+			id: sharps_ctrl
+			ctrl_tabpanel_ref: root.ctrl_tabpanel_ref
+
+	DrawerAccordionItem:
+		title: 'INTERVALS'
+		Label:
+			text: 'interval highlight control'
+
+	DrawerAccordionItem:
+		title: 'CHORDS'
+		Label:
+			text: 'chord highlight control'
+
+	DrawerAccordionItem:
+		title: 'SCALES'
+		ScaleHLightScroll:
+			id: scale_scroll
+			ctrl_tabpanel_ref: root.ctrl_tabpanel_ref
+			
+
