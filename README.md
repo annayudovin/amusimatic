@@ -27,3 +27,6 @@ While I've devoted the majority of my spare time to working on this project, it'
 <b>Contributing:</b>
 
 Please do! I'm learning (both python and music theory) as I go, so pointers and corrections are very welcome. Moreover this is entirely a passion project, competing for limited free time with a large number of other interests and hobbies. While I intend to keep working on it for as long as it takes to complete, I'd prefer to actually see it finished (and use it!) sometime before the heat-death of the universe.
+
+![screenshot1](https://user-images.githubusercontent.com/104697144/166333244-08c5b0b0-18e4-4ce0-81fa-0b56fa738a45.png)
+![screenshot2](https://user-images.githubusercontent.com/104697144/166333261-30810cdb-6b57-40d7-9d7e-2e1d96b5caef.png)
