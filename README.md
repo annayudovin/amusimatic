@@ -23,3 +23,7 @@ This application is intended for a non-mobile platform: mobile applications rely
 <b>Status Quo:</b>
 
 While I've devoted the majority of my spare time to working on this project, it's still nowhere near complete, and, as of right now, is only barely functional as a midi "player". I've intentionally devoted the lion's share of development time to the functionality of the user interface itself (as opposed to processing midi files, because it is my observation that existing software's functionality is most severely limited specifically by the design (and sometimes execution) of its user interface (as opposed to any other factor). At one point, it simply became necessary to create the exising midi-related functionality to continue defining and expanding the interface. It is, of course, my eventual goal to "catch up" the two, but for now, most of the available controls don't actually "do" anything except attempt to be well-behaved visual elements.
+
+<b>Contributing:</b>
+
+Please do! I'm learning (both python and music theory) as I go, so pointers and corrections are very welcome. Moreover this is entirely a passion project, competing for limited free time with a large number of other interests and hobbies. While I intend to keep working on it for as long as it takes to complete, I'd prefer to actually see it finished (and use it!) sometime before the heat-death of the universe.
