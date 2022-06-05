@@ -45,7 +45,7 @@ from source.notegrid import Marker, Note, Octave, PartialOct, CollapsedOct, Note
 from source.toolbar import Toolbar, SectionDropDown, FileDropDown, PlayCtrl
 from source.dialogs import LoadDialog, SaveDialog, SettingsDialog
 from source.custom import  USpinner, DrawerAccordion, DrawerAccordionItem, AutoSizedTabHeader, AutoSizedTabItem, GradientSlider, HSVColorPicker, HSVColorPickerDropDown, HSVTColorPicker, HSVTColorDropDown, HSVTColorMenuBtn, AdjusterBox, SliderAdjuster, VolumeAdjuster
-from source.controlpanel import VolumeTempoTab, ChannelColor, ChannelCheck, ChannelDropDown, Channel, ChannelList, ChannelListDropDown, ChannelCtrlTab, ScaleNameSelector, IntervalStrSelector, ScalePicker, ScalePickerDropDown, RootNoteSelector, ScaleDisplay, SharpsHighlight, HighlightCtrlTab
+from source.controlpanel import TempoTab, ChannelColor, ChannelCheck, ChannelDropDown, Channel, ChannelList, ChannelListDropDown, ChannelCtrlTab, ScaleNameSelector, IntervalStrSelector, ScalePicker, ScalePickerDropDown, RootNoteSelector, ScaleDisplay, SharpsHighlight, HighlightCtrlTab
 
 
 class LeftTabbedPanel(TabbedPanel):
@@ -56,12 +56,19 @@ class LeftTabbedPanel(TabbedPanel):
 		if self._current_tab.text != '':
 			self._current_tab.content.tab_selected()
 	
+	
 	def activate_tab_num(self, num=1):
 		# tabs are displayed in reverse order, so the first tab is the last in self.tab_list
 		self.switch_to(self.tab_list[-num], do_scroll=True)
-		self.cur_tab_num = len(self.top_level_ref.left_panel.tab_list) - self.top_level_ref.left_panel.tab_list.index(
-			self.top_level_ref.left_panel.current_tab)
-
+		self.cur_tab_num = len(self.tab_list) - self.tab_list.index(self.current_tab)
+		
+			
+	def reset_all_tabs(self):
+		for tab in self.tab_list:
+			if tab.text != '':
+				tab.content.reset()
+			
+			
 
 class ContainerLayout(GridLayout):
 	toolbar_widget = ObjectProperty(None)

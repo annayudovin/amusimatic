@@ -2,7 +2,7 @@
 
 import math
 
-__all__ = ('chroma_dict', 'chroma', 'scale_steps', 'diatonic_scales', 'other_scales', 'instruments', 'bpm2tempo', 'tempo2bpm', 'camel_to_snake', 'snake_to_camel', 'Log2', 'isPowerOfTwo', 'nearestPowerOfTwo', 'get_document_directory', 'linear_merge')
+__all__ = ('chroma_dict', 'chroma', 'scale_steps', 'diatonic_scales', 'other_scales', 'instruments', 'bpm2tempo', 'tempo2bpm', 'camel_to_snake', 'snake_to_camel', 'Log2', 'isPowerOfTwo', 'nearestPowerOfTwo', 'calculate_bar_ticks', 'get_document_directory', 'linear_merge')
 
 # -------------------------------
 # ---global dictionaries---
@@ -95,7 +95,18 @@ def nearestPowerOfTwo(n):
 	
 	return p2
 
-	
+#-------------------------------
+
+def calculate_bar_ticks(time_sig_numerator, time_sig_denominator, ticks_per_beat):
+
+	if time_sig_denominator != 4 and isPowerOfTwo(time_sig_denominator):
+		quarter_beat_multiplier = 2**(2 - Log2(time_sig_denominator))
+	else:
+		#if time_sig_denominator is not a power of two, for the sake of initial visualization, pretend it's 4 (default)
+		quarter_beat_multiplier = 1
+
+	return time_sig_numerator * ticks_per_beat * quarter_beat_multiplier
+		
 #-------------------------------
 def get_document_directory():
 	user_data_dir = App.get_running_app().user_data_dir

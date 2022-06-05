@@ -238,12 +238,8 @@ class LoadedTrack():
 			
 		if 'has_tempo' in kwargs:
 			self.has_tempo = kwargs.get('has_tempo')
-			#self.single_tempo = False
-			#self.tempo = 500000
 		else:
 			self.has_tempo = False
-			#self.single_tempo = True
-			#self.tempo = 500000
 		
 		if 'tick_len' in kwargs:
 			self.tick_length = kwargs.get('tick_len')
@@ -261,7 +257,6 @@ class FilePlayer(MidiControlBase):
 		self.song_tick_length = 0
 		self.ticks_per_beat = 480		#default=480	
 		self.tempo = 500000		#default
-		self.single_tempo = True
 		
 		self.curr_tt = 0
 		self.meta_cursor = 0
@@ -282,15 +277,6 @@ class FilePlayer(MidiControlBase):
 		if 'filename' in kwargs:
 			self.load_from_file(kwargs.get('filename'), kwargs.get('visual_track_lst', None))			
 
-			
-	def set_single_tempo(self, tempo):
-		self.single_tempo = True
-		self.tempo = tempo
-		
-		
-	def unset_single_tempo(self):
-		self.single_tempo = False
-		self.tempo = 500000
 		
 #-----------------------------------------------------------------------------------------------------
 		
@@ -611,6 +597,7 @@ class FilePlayer(MidiControlBase):
 
 		track_info_list = []
 		list_of_track_msgs = []
+		list_of_tempo_msgs = []
 		
 		self.playable_tracks.clear()
 		self.merged_meta_track.clear()
@@ -666,26 +653,30 @@ class FilePlayer(MidiControlBase):
 
 				if found_tempo:
 					self.tempo = t_msg.tempo
-					tempo_msgs_cnt += len(list(msg for msg in track if msg.type == 'set_tempo'))
+					list_of_tempo_msgs.extend(list(msg for msg in track if msg.type == 'set_tempo'))
+					tempo_msgs_cnt = len(list_of_tempo_msgs)
 					tempo_track_cnt += 1
 					tempo_track_idx = len(track_info_list)
 				
 				self.playable_tracks.append(track)
 				track_info_list.append(track_info)
 		#---done looping through tracks - got all track info		
-				
+		
+		#add list of tempos to every visual_track in the list (if any), for use in UI
+		if visual_track_lst is not None:
+			for visual_track in visual_track_lst:
+				visual_track.add_tempo_list(list_of_tempo_msgs)
+						
+						
 		#---if there's only a single tempo message on a non-playable track, we don't need a separate 'tempo track'		
 		if tempo_track_cnt == 1 and tempo_msgs_cnt == 1 and track_info_list[tempo_track_idx].playable == False:
 			del track_info_list[tempo_track_idx]
 			del self.playable_tracks[tempo_track_idx]
 		
-		if tempo_msgs_cnt == 1:
-			self.set_single_tempo(self.tempo)
-		else:
-			self.unset_single_tempo()
-		
 		#set song length in total ticks
 		self.song_tick_length = max(list(trk.tick_length for trk in track_info_list))
+		#done with this list, release memory
+		track_info_list.clear()
 			
 		for track_idx, playable_track in enumerate(self.playable_tracks):
 			#create meta track for each playable track
@@ -769,7 +760,6 @@ class FilePlayer(MidiControlBase):
 		self.song_tick_length = 0
 		self.ticks_per_beat = 480		#default=480	
 		self.tempo = 500000		#default
-		self.single_tempo = True
 		
 		self.curr_tt = 0
 		self.meta_cursor = 0

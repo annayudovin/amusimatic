@@ -8,10 +8,11 @@
 	max: 10
 	step: 1
 	power_of_2: False
-	digits: 2	
+	digits: 2
+	displ_only: False
 	hpad: 2
 	vpad: 3
-	x_pos: (self.size[0] - (32 + self.digits * 10 + self.hpad * 2)) / 2
+	x_pos: (self.size[0] - (32 + self.digits * 10 + 10 + self.hpad * 2)) / 2
 
 	Button:
 		canvas.after:
@@ -23,16 +24,16 @@
 				
 		id: subtract
 		background_normal: ''
-		background_color: [.3, .3, .3, .5]
+		background_color: [.3, .3, .3, .5] if not root.displ_only else [.45, .45, .45, .5]
 		size: 15, 15
 		pos: (root.pos[0] + root.x_pos + root.hpad, root.pos[1] + root.vpad)
 		text: '–'
 		font_size: 10
-		on_release: root.decrement()		
-			
+		on_release: root.decrement() if not root.displ_only else 0
+
 	Label:	
 		id: display
-		size: root.digits * 10, 20
+		size: (root.digits * 10 + 10), 20
 		pos: (root.pos[0] + root.x_pos + 16 + root.hpad, root.pos[1]) # + root.vpad)
 		text: str(root.val)
 		
@@ -46,12 +47,12 @@
 				
 		id: add
 		background_normal: ''
-		background_color: [.3, .3, .3, .5]
+		background_color: [.3, .3, .3, .5] if not root.displ_only else [.45, .45, .45, .5]
 		size: 15, 15
-		pos: (root.pos[0] + root.x_pos + 16 + root.digits * 10 + root.hpad * 2, root.pos[1] + root.vpad)
+		pos: (root.pos[0] + root.x_pos + 16 + root.digits * 10 + 10 + root.hpad * 2, root.pos[1] + root.vpad)
 		text: '+'
 		font_size: 10
-		on_release: root.increment()		
+		on_release: root.increment() if not root.displ_only else 0
 			
 		
 <SliderAdjuster@Widget>
@@ -63,6 +64,7 @@
 	slide_step: 1
 	val: 0
 	digits: 1
+	displ_only: False
 	ctrl_tabpanel_ref: None
 	adjuster_box: adjuster_box
 	slider: slider
@@ -89,6 +91,7 @@
 		step: root.box_step
 		power_of_2: False
 		digits: root.digits
+		displ_only: root.displ_only
 		size: max(root.size[0], 98), 18 
 		pos: (root.pos[0], root.pos[1] + 18)
 		on_val: root.on_adjuster_val(self, self.val)	
@@ -104,7 +107,7 @@
 		cursor_height: '10sp'
 		size: max(root.size[0], 98), 18 
 		pos: root.pos
-		on_value: root.on_slider_value(self, self.value)
+		on_value: root.on_slider_value(self, self.value) if not root.displ_only else 0
 
 
 <VolumeAdjuster@Widget>

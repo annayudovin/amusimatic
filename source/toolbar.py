@@ -274,7 +274,7 @@ class PlayCtrl(Widget):
 				
 				
 	def create_blank_track(self):	
-		ticks_per_bar = self.top_level_ref.left_panel.voltempo_ctrl.ticks_per_bar.val
+		ticks_per_bar = self.top_level_ref.left_panel.tempo_ctrl.tpb_ctrl.val
 		num_bars = self.top_level_ref.note_scroller.cont_sz_x / self.top_level_ref.note_scroller.track_tabs.lined_note_grid.bar_length
 
 		return VisualTrack(top_level_ref = self.top_level_ref, tick_len=num_bars*ticks_per_bar)		

@@ -98,7 +98,7 @@ class Marker(Widget):
 	def rescale(self, *args):
 		#TODO: spacer(?), track index(?)
 		#grid_scale = self.top_level_ref.note_scroller.grid_time_scale
-		ticks_per_bar = self.top_level_ref.left_panel.voltempo_ctrl.ticks_per_bar.val
+		ticks_per_bar = self.top_level_ref.left_panel.tempo_ctrl.tpb_ctrl.val
 		grid_scale = ticks_per_bar/self.top_level_ref.note_scroller.track_tabs.lined_note_grid.bar_length
 		
 		self.tt_on = int(round((self.pos[0] - self.parent.pos[0]) * grid_scale, 0))
@@ -636,9 +636,10 @@ class TrackTabbedPanel(TabbedPanel):
 		self.note_scroller_ref.visual_track_lst.append(self.top_level_ref.toolbar_widget.play_ctrl.create_blank_track())
 		
 		self._add_adder_tab()
-
 		#self.tab_list[0].active = True
-
+		
+		self.top_level_ref.left_panel.reset_all_tabs()
+		
 		
 	def on_file_open(self, playable_track_names):
 		#delete existing tabs
@@ -744,21 +745,12 @@ class NoteScroll(ScrollView):
 	def on_scroll_x(self, instance, value):
 		if self.top_level_ref.time_scroller.scroll_x != value:
 			self.top_level_ref.time_scroller.scroll_x = value
-			
-		#[padding_left, padding_top, padding_right, padding_bottom]
-		#self.track_tabs._tab_layout.padding[0]
-		self.track_tabs._tab_layout.padding[0] = int(self.int_grid_width * value)
+
 		if value <= .33:
 			self.track_tabs.tab_pos = 'top_left'
-			self.track_tabs._tab_layout.padding[0] = self.int_grid_width/3 - self.track_tabs._tab_strip.width
-			#print(int(self.int_grid_width * value * .5))
-			#self.track_tabs._tab_layout.padding[0] = int(self.int_grid_width * value * .5) #str(int(self.int_grid_width * value * .5)) + 'dp'
-		elif value <= .66:
-			self.track_tabs._tab_layout.padding[0] = 2 #'2dp'
-			self.track_tabs._tab_layout.padding[2] = 2			
+		elif value > .33 and value <= .66:			
 			self.track_tabs.tab_pos = 'top_mid'
-		else:
-			self.track_tabs._tab_layout.padding[2] = 50
+		elif value > .66:
 			self.track_tabs.tab_pos = 'top_right'
 			
 		self.recalc_lbl_pos(instance)
@@ -905,7 +897,7 @@ class Timeline(Widget):
 		progress_percent, progress_tt = progress_list
 		
 		#self.ticker.value = (self.slide_width-self.h_pad)*progress_percent/200.0
-		ticks_per_bar = self.top_level_ref.left_panel.voltempo_ctrl.ticks_per_bar.val
+		ticks_per_bar = self.top_level_ref.left_panel.tempo_ctrl.tpb_ctrl.val
 		grid_scale = 2 * ticks_per_bar/self.top_level_ref.note_scroller.track_tabs.lined_note_grid.bar_length
 		
 		self.ticker.value = progress_tt / grid_scale

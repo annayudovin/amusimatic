@@ -17,16 +17,7 @@ from .midoext import ExtMessage
 #def printListToText(textFilename, list):
 #def printNestedListToText(textFilename, list):
 
-def calculate_bar_ticks(time_sig_numerator, time_sig_denominator, ticks_per_beat):
 
-	if time_sig_denominator != 4 and isPowerOfTwo(time_sig_denominator):
-		quarter_beat_multiplier = 2**(2 - Log2(time_sig_denominator))
-	else:
-		#if time_sig_denominator is not a power of two, for the sake of initial visualization, pretend it's 4 (default)
-		quarter_beat_multiplier = 1
-
-	return time_sig_numerator * ticks_per_beat * quarter_beat_multiplier
-	
 	
 def calculate_midi_bars(bar_len, song_total_ticks):
 	return math.ceil(song_total_ticks/bar_len)
@@ -160,7 +151,7 @@ class VisualTrack:
 
 		self._check_channel_voices()
 		
-		
+	
 	def _check_channel_voices(self):
 		self.channel_voice_dict.clear()
 		
@@ -224,9 +215,15 @@ class VisualTrack:
 		self.tempo = tempo
 	
 	
-	def unset_single_tempo(self):
+	def set_avg_tempo(self, tempo_msg_lst):
 		self.single_tempo = False
-	
+		
+		sum = 0
+		for msg in tempo_msg_lst:
+			sum += msg.tempo
+		
+		self.tempo = sum/len(tempo_msg_lst)
+		
 	
 	def add_marker(self, marker):
 		if self.channels is None:
@@ -268,7 +265,17 @@ class VisualTrack:
 		#print(f'removed marker channel:{marker.channel} note:{marker.midinum}; marker_lst len:{len(self.channels[marker.channel].marker_lst)}, note_lst len:{len(self.channels[marker.channel].note_lst)}')
 		self.dirty = True
 
-				
+	
+	def add_tempo_list(self, tempo_messages):
+		#TODO: create tempo message markers on overlay
+		if len(tempo_messages) == 1:
+			self.set_single_tempo(tempo_messages[0].tempo)
+		elif len(tempo_messages) == 0:
+			pass
+		else:
+			self.set_avg_tempo(tempo_messages)
+
+
 	def add_note_list(self, visual_note_lst):
 		if self.channels is not None:
 			return
@@ -328,7 +335,6 @@ class VisualTrack:
 				
 				
 	def visualize(self, **kwargs):
-		#TODO: for each channel, activate the channel instrument
 		
 		if self.top_level_ref is None:
 			if 'top_level_ref' in kwargs:
@@ -354,9 +360,11 @@ class VisualTrack:
 		if 'tick_len' in kwargs and 'ticks_per_beat' in kwargs and 'time_sig_n' in kwargs and 'time_sig_d' in kwargs:
 			self.ticks_per_bar = calculate_bar_ticks(self.time_sig_numerator, self.time_sig_denominator, self.ticks_per_beat)
 			self.bars = max(10, calculate_midi_bars(self.ticks_per_bar, self.track_total_ticks))
-		
-		self.top_level_ref.left_panel.voltempo_ctrl.set_from_file(tempo=self.tempo, tickdiv=self.ticks_per_beat, \
-			tsig_n=self.time_sig_numerator, tsig_d=self.time_sig_denominator, ticks_per_bar=self.ticks_per_bar)
+				
+		# self.single_tempo = True
+		# self.tempo = tempo
+		self.top_level_ref.left_panel.tempo_ctrl.set_from_file(tempo=self.tempo, single_tempo=self.single_tempo, \
+			tickdiv=self.ticks_per_beat, tsig_n=self.time_sig_numerator, tsig_d=self.time_sig_denominator, ticks_per_bar=self.ticks_per_bar)
 		
 		if 'mido_track' in kwargs:
 			self._mine_mido_track(kwargs.get('mido_track'))
@@ -375,9 +383,11 @@ class VisualTrack:
 				self.channels[chn_num].marker_lst.clear()
 				self.channels[chn_num].init_color(self.top_level_ref.left_panel.chnl_ctrl.chn_scroll.channel_list.get_channel_color(chn_num))
 				
+				#for each channel, activate the channel instrument
 				if self.voices_timed == False and len(self.channel_voice_dict) > 0:
 					self.channels[chn_num]._midi_voice = self.channel_voice_dict.get(chn_num, 0)
-					
+				
+				#create/place note markers
 				for note in self.channels[chn_num].note_lst:
 					#print(note.channel, note.midinum, note.tt_on, note.tt_off)
 					mrkr = Marker(top_level_ref=self.top_level_ref, chnum=note.channel, \

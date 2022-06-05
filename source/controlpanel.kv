@@ -5,7 +5,7 @@
 #-----------------------------------------------------------------------------------		
 #--------------Volume/Tempo Controls Tab -------------------------------------------
 				
-#parent = VolumeTempoTab			
+#parent = TempoTab			
 <TimeSig@Widget>
 	bcolor: [.2, .2, .2, 1]
 	numerator: numerator
@@ -62,7 +62,7 @@
 		on_val: root.check_denominator()
 	
 	
-#parent = VolumeTempoTab	
+#parent = TempoTab	
 <ShortestNote@Widget>
 	bcolor: [.2, .2, .2, 1]
 	denominator: denominator
@@ -109,7 +109,7 @@
 		pos: (root.pos[0], root.pos[1] + 6)
 		
 
-#parent = VolumeTempoTab	
+#parent = TempoTab	
 <TicksPerBar@Widget>
 	bcolor: [.2, .2, .2, 1]
 	tpb_lbl: tpb_lbl
@@ -137,7 +137,7 @@
 		
 		
 #parent = LeftTabbedPanel.TabbedPanelItem
-<VolumeTempoTab@Widget>
+<TempoTab@Widget>
 	bcolor: [.1, .1, .1, 1]
 	
 	ctrl_tabpanel_ref: None
@@ -148,7 +148,7 @@
 	tempo_ctrl: tempo_ctrl 
 	tickdiv_ctrl: tickdiv_ctrl
 	time_sig_ctrl: time_sig_ctrl
-	ticks_per_bar: ticks_per_bar
+	tpb_ctrl: tpb_ctrl
 	shortest_note: shortest_note
 	time_approve: time_approve
 	
@@ -193,7 +193,7 @@
 	SliderAdjuster:
 		id: tempo_ctrl
 		ctrl_tabpanel_ref: root.ctrl_tabpanel_ref
-		text: 'TEMPO: (BPM)'
+		text: 'TEMPO(in BeatsPerMin):' if not self.displ_only else 'AVG TEMPO(BPM):'
 		min: 1
 		max: 250
 		box_step: 1
@@ -215,10 +215,10 @@
 		digits: 4
 		size: max(root.size[0] - 8, 98), 58
 		pos: (root.pos[0] + 4, root.pos[1] - 314 + 528)	
-		on_val: root.recalc_scale()
+		on_val: root.recalc_time_scale()
 	
 	TicksPerBar:
-		id: ticks_per_bar
+		id: tpb_ctrl
 		ctrl_tabpanel_ref: root.ctrl_tabpanel_ref
 		val: 1920		
 		size: max(root.size[0] - 8, 98), 38

@@ -1,9 +1,9 @@
-#defines VolumeTempoTab, ChannelColor, ChannelCheck, ChannelDropDown, Channel, ChannelList, ChannelListDropDown, ChannelCtrlTab, ScaleNameSelector, IntervalStrSelector, ScalePicker, ScalePickerDropDown, RootNoteSelector, ScaleDisplay, SharpsHighlight, HighlightCtrlTab
+#defines TempoTab, ChannelColor, ChannelCheck, ChannelDropDown, Channel, ChannelList, ChannelListDropDown, ChannelCtrlTab, ScaleNameSelector, IntervalStrSelector, ScalePicker, ScalePickerDropDown, RootNoteSelector, ScaleDisplay, SharpsHighlight, HighlightCtrlTab
 		
 # #--------------Volume/Tempo Controls Tab --------	
 # <TimeSig@Widget>
 # <ShortestNote@Widget>
-# <VolumeTempoTab@Widget>
+# <TempoTab@Widget>
 # #--------------Channel Controls Tab -------------
 # <ChannelColor@Widget>	
 # <ChannelCheck@Widget>:
@@ -70,24 +70,35 @@ from .custom import DrawerAccordion, DrawerAccordionItem, HSVColorPicker, HSVCol
 from .notegrid import Marker, Note, Octave, PartialOct, CollapsedOct, Notegrid, LinedNoteGrid, TrackTabbedPanel, NoteScroll, TickSlider, TickLabel, Timeline, TimelineScroll
 
 
-__all__ = ('VolumeTempoTab', 'ChannelColor', 'ChannelCheck', 'ChannelDropDown', 'Channel', 'ChannelList', 'ChannelListDropDown', 'ChannelCtrlTab', 'ScaleNameSelector', 'IntervalStrSelector', 'ScalePicker', 'ScalePickerDropDown', 'RootNoteSelector', 'ScaleDisplay', 'SharpsHighlight', 'HighlightCtrlTab')
+__all__ = ('TempoTab', 'ChannelColor', 'ChannelCheck', 'ChannelDropDown', 'Channel', 'ChannelList', 'ChannelListDropDown', 'ChannelCtrlTab', 'ScaleNameSelector', 'IntervalStrSelector', 'ScalePicker', 'ScalePickerDropDown', 'RootNoteSelector', 'ScaleDisplay', 'SharpsHighlight', 'HighlightCtrlTab')
 #------------------------------------------------------------------------------------------------------------------------------
 #--------------Volume/Tempo Controls Tab -------------------------------------------------------------------------------------------
 
-class VolumeTempoTab(Widget):
+class TempoTab(Widget):
 	
 	def __init__(self, **kwargs):
-		super(VolumeTempoTab, self).__init__(**kwargs)
+		super(TempoTab, self).__init__(**kwargs)
+		self.reset()
 		
+	
+	def reset(self):
 		self.global_vol_init = 0
 		
 		self.tempo_init = 500000			#default
-		self.bpm_init = 120
+		self.bpm_init = 120					#tempo2bpm(500000)
 		self.tickdiv_init = 480				#default
 		self.time_sig_init_numerator = 4		#default
 		self.time_sig_init_denominator = 4		#default
 		self.shortest_note_init = 32			#default
-	
+
+		if hasattr(self, 'tempo_ctrl') and self.tempo_ctrl is not None:
+			self.tempo_ctrl.displ_only = False
+		
+			if hasattr(self, 'tab_selected') and hasattr(self, 'recalc_time_scale'):
+				self.tab_selected()
+				self.recalc_time_scale()
+
+				
 	def tab_selected(self):
 		#refresh with default values
 		
@@ -101,7 +112,7 @@ class VolumeTempoTab(Widget):
 		
 		if self.tickdiv_init != self.tickdiv_ctrl.val:
 			self.tickdiv_ctrl.val = self.tickdiv_init
-		
+
 		if self.time_sig_init_numerator != self.time_sig_ctrl.numerator.val:
 			self.time_sig_ctrl.numerator.val = self.time_sig_init_numerator
 		
@@ -110,51 +121,29 @@ class VolumeTempoTab(Widget):
 		
 		if self.shortest_note_init != self.shortest_note.denominator.val:
 			self.shortest_note.denominator.val = self.shortest_note_init
-	
 
-	def set_from_file(self, tempo=500000, tickdiv=480, tsig_n=4, tsig_d=4, ticks_per_bar=1920):
-		self.tickdiv_init = tickdiv
-		self.time_sig_init_numerator = tsig_n
-		self.time_sig_init_denominator = tsig_d
-		self.ticks_per_bar.val = ticks_per_bar
+
+	def set_from_file(self, tempo=500000, single_tempo=True, tickdiv=480, tsig_n=4, tsig_d=4, ticks_per_bar=1920):
+		self.tickdiv_ctrl.val = self.tickdiv_init = tickdiv
+		self.time_sig_ctrl.numerator.val = self.time_sig_init_numerator = tsig_n
+		self.time_sig_ctrl.denominator.val = self.time_sig_init_denominator = tsig_d
+		self.tpb_ctrl.val = ticks_per_bar
 		
 		self.tempo_init = tempo
-		self.bpm_init =	tempo2bpm(tempo)
-	
-	
-	def bpm2tempo(bpm):
-		return int(round((60 * 1000000) / bpm))
-
-		
-	def tempo2bpm(tempo):
-		return (60 * 1000000) / tempo
-	
+		self.tempo_ctrl.val = self.bpm_init = tempo2bpm(tempo)
+		if not single_tempo:
+			self.tempo_ctrl.displ_only = True
 	
 	def adjust_volume(self):
-		
+		# TODO: check if file is loaded, update volume of all tracks in file		
 		if self.global_vol_init != self.global_vol.val:
 			self.global_vol_init = self.global_vol.val
-		# TODO: check if file is loaded, update volume of all tracks in file
-		# TODO: move volume control for grid clicks elsewhere
 			self.ctrl_tabpanel_ref.top_level_ref.note_player.set_volume(self.global_vol.val)
 
-
-	def recalc_scale(self):
-		time_sig_denominator = self.time_sig_ctrl.denominator.val
-		ticks_per_beat= self.tickdiv_ctrl.val
-		
-		if time_sig_denominator == 0:
-			quarter_beat_multiplier = 1
-		elif time_sig_denominator != 4 and isPowerOfTwo(time_sig_denominator):
-			quarter_beat_multiplier = 2**(2 - Log2(time_sig_denominator))
-		else:
-			quarter_beat_multiplier = 1
-
-		tpb = min(1, self.time_sig_ctrl.numerator.val) * ticks_per_beat * quarter_beat_multiplier	
-		self.ticks_per_bar.val = tpb
-			
-			
-			
+	def recalc_time_scale(self):
+		self.tpb_ctrl.val = calculate_bar_ticks(self.time_sig_ctrl.numerator.val, self.time_sig_ctrl.denominator.val, self.tickdiv_ctrl.val)	
+						
+						
 	def adjust_timing(self):
 		pass
 
@@ -165,13 +154,13 @@ class VolumeTempoTab(Widget):
 class TimeSig(Widget):
 
 	def check_numerator():
-		self.parent.recalc_scale()
+		self.parent.recalc_time_scale()
 
 	def check_denominator():
-		self.parent.recalc_scale()
+		self.parent.recalc_time_scale()
 
 #----class TimeSig--------
-# parent = VolumeTempoTab
+# parent = TempoTab
 # class TimeSig(BoxLayout):				
 # numerator = ObjectProperty(None)
 
@@ -205,8 +194,8 @@ class TimeSig(Widget):
 
 
 #----class ShortestNote--------
-# parent = VolumeTempoTab
-# VolumeTempoTab.parent = LeftTabbedPanel.TabbedPanelItem
+# parent = TempoTab
+# TempoTab.parent = LeftTabbedPanel.TabbedPanelItem
 # class ShortestNote(BoxLayout):				
 # denominator = ObjectProperty(None)
 
@@ -545,9 +534,13 @@ class ChannelListDropDown(DropDown):
 class ChannelCtrlTab(BoxLayout):
 	auto_select = BooleanProperty(False)
 	
+	def reset(self):
+		pass
+		
+		
 	def tab_selected(self):
 		pass
-	#print('channel tab')
+		#print('channel tab')
 
 
 # def switch_editable(self, ToggleButtonObject, toggleState):
@@ -973,3 +966,7 @@ class SharpsHighlight(Widget):
 class HighlightCtrlTab(BoxLayout):
 	def tab_selected(self):
 		pass
+		
+	def reset(self):
+		pass
+		
